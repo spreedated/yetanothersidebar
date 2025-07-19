@@ -1,0 +1,72 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetAnotherMonitor", "YetAnotherMonitor\YetAnotherMonitor.csproj", "{ADFDD287-DE36-4B4D-81CA-1FF2D879079A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{DE7EED64-E5E7-4BB3-B7EB-3F5E1BBF60DC}"
+	ProjectSection(SolutionItems) = preProject
+		Libs\neXn.Lib.ConfigurationHandler.dll = Libs\neXn.Lib.ConfigurationHandler.dll
+		Libs\neXn.Lib.ConfigurationHandler.pdb = Libs\neXn.Lib.ConfigurationHandler.pdb
+		Libs\neXn.Lib.ConfigurationHandler.xml = Libs\neXn.Lib.ConfigurationHandler.xml
+		Libs\neXn.Lib.Wpf.dll = Libs\neXn.Lib.Wpf.dll
+		Libs\neXn.Lib.Wpf.xml = Libs\neXn.Lib.Wpf.xml
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D9519A11-C250-4AA6-8A4C-57EE096F21C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{B6D7D1D6-7F05-4A77-92DB-83F2F3E9B338}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLGAgentBattery", "ServiceLGAgentBattery\ServiceLGAgentBattery.csproj", "{BF299407-E23E-4CEC-AC48-9E43BFD42BFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTableConverter", "CTableConverter\CTableConverter.csproj", "{973A2F98-36BA-4660-A236-EFEC316D83E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConversionTools", "ConversionTools\ConversionTools.csproj", "{50176E14-F76B-EB73-8AAC-FAD7EBD9CF16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ADFDD287-DE36-4B4D-81CA-1FF2D879079A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADFDD287-DE36-4B4D-81CA-1FF2D879079A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADFDD287-DE36-4B4D-81CA-1FF2D879079A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADFDD287-DE36-4B4D-81CA-1FF2D879079A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9519A11-C250-4AA6-8A4C-57EE096F21C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9519A11-C250-4AA6-8A4C-57EE096F21C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9519A11-C250-4AA6-8A4C-57EE096F21C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9519A11-C250-4AA6-8A4C-57EE096F21C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D7D1D6-7F05-4A77-92DB-83F2F3E9B338}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D7D1D6-7F05-4A77-92DB-83F2F3E9B338}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D7D1D6-7F05-4A77-92DB-83F2F3E9B338}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D7D1D6-7F05-4A77-92DB-83F2F3E9B338}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF299407-E23E-4CEC-AC48-9E43BFD42BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF299407-E23E-4CEC-AC48-9E43BFD42BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF299407-E23E-4CEC-AC48-9E43BFD42BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF299407-E23E-4CEC-AC48-9E43BFD42BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{973A2F98-36BA-4660-A236-EFEC316D83E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{973A2F98-36BA-4660-A236-EFEC316D83E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{973A2F98-36BA-4660-A236-EFEC316D83E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{973A2F98-36BA-4660-A236-EFEC316D83E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50176E14-F76B-EB73-8AAC-FAD7EBD9CF16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50176E14-F76B-EB73-8AAC-FAD7EBD9CF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50176E14-F76B-EB73-8AAC-FAD7EBD9CF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50176E14-F76B-EB73-8AAC-FAD7EBD9CF16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {00C2102D-CE0E-4ABD-B7CF-05CAC97A87D5}
+	EndGlobalSection
+EndGlobal

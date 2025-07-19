@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Version>1.1.1</Version>
+    <LangVersion>latest</LangVersion>
+    <Authors>Dante Wackermann</Authors>
+    <Copyright>2020-2025 (c) Dante Wackermann</Copyright>
+    <NoWarn>1701;1702;IDE0063;IDE0074;IDE0290</NoWarn>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>services.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+    <PackageReference Include="Lightstreamer.DotNetStandard.Client" Version="6.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="System.CodeDom" Version="9.0.7" />
+    <PackageReference Include="System.IO.Ports" Version="9.0.7" />
+    <PackageReference Include="System.Management" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HidSharp">
+      <HintPath>..\Libs\HidSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="HWHash">
+      <HintPath>..\Libs\HWHash.dll</HintPath>
+    </Reference>
+    <Reference Include="LibreHardwareMonitorLib">
+      <HintPath>..\Libs\LibreHardwareMonitorLib.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleMem">
+      <HintPath>..\Libs\SimpleMem.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

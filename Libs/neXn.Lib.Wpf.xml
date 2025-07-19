@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>neXn.Lib.Wpf</name>
+    </assembly>
+    <members>
+        <member name="M:neXn.Lib.Wpf.Extensions.Refresh``1(System.Collections.ObjectModel.ObservableCollection{``0})">
+            <summary>
+            Force refresh of observable collection
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="value"></param>
+        </member>
+        <member name="T:neXn.Lib.Wpf.Models.TrackableItem">
+            <summary>
+            Creates a trackable item<br/>
+            changes to properties/fields can be tracked by<br/>
+            implementing the SetChanged() method to the setter of<br/>
+            the tracked property/field.<br/><br/>
+            After setting the values use EndInit() to start track changes.
+            </summary>
+        </member>
+    </members>
+</doc>

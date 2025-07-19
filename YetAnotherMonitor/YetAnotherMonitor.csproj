@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>yetanothermonitor.snk</AssemblyOriginatorKeyFile>
+    <PackageIcon>proxy.png</PackageIcon>
+    <ApplicationIcon>proxy.ico</ApplicationIcon>
+    <Version>1.0.9.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Authors>Dante Wackermann</Authors>
+    <Copyright>2020-2025 (c) Dante Wackermann</Copyright>
+    <NoWarn>1701;1702;IDE0063;IDE0074</NoWarn>
+    <Title>Yet Another Monitor</Title>
+    <AssemblyTitle>Yet Another Monitor</AssemblyTitle>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\proxy.ico" />
+    <None Remove="Resources\proxy.png" />
+    <None Remove="Resources\proxy_white.ico" />
+    <None Remove="Resources\proxy_white.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="proxy.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Assets\proxy.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Coolicons" Version="5.1.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageReference Include="System.Management" Version="9.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ConversionTools\ConversionTools.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HWHash">
+      <HintPath>..\Libs\HWHash.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Lib.ConfigurationHandler">
+      <HintPath>..\Libs\neXn.Lib.ConfigurationHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Lib.Wpf">
+      <HintPath>..\Libs\neXn.Lib.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleMem">
+      <HintPath>..\Libs\SimpleMem.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\proxy.ico" />
+    <Resource Include="Resources\proxy.png" />
+    <Resource Include="Resources\proxy_white.ico" />
+    <Resource Include="Resources\proxy_white.png" />
+  </ItemGroup>
+
+</Project>
