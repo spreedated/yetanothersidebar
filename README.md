@@ -9,7 +9,7 @@ Yet another Sidebar
 ![Tests: NUnit](https://img.shields.io/badge/tests-NUnit-464646?logo=nunit&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-YetAnotherMonitor is a modern, customizable sidebar application for Windows,
+Yet another Sidebar is a modern, customizable sidebar application for Windows,
 designed to provide real-time monitoring of various data sources directly on your desktop.
 
 The sidebar displays up-to-date information such as weather conditions, gas station prices, hardware telemetry and more, all in a visually appealing and interactive interface.
@@ -37,7 +37,7 @@ Your help is valuable since this is a hobby project for all of us: we do develop
 
 ## Support
 
-If you encounter any issues or have questions, please open an [issue](https://github.com/spreedated/cs2adrtracker/issues).
+If you encounter any issues or have questions, please open an [issue](https://github.com/spreedated/yetanothersidebar/issues).
 
 ## Contribution
 Pull requests are very welcome.
