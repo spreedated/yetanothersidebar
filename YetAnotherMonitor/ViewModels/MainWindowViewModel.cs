@@ -137,7 +137,7 @@ namespace YetAnotherMonitor.ViewModels
         {
             this.taskbarIcon = new()
             {
-                IconSource = new BitmapImage(new Uri(@"pack://application:,,,/resources/proxy_white.ico", UriKind.Absolute))
+                IconSource = new BitmapImage(new Uri(@"pack://application:,,,/resources/icon.ico", UriKind.Absolute))
             };
 
             this.gasstationPricesService = new RetrieveGasstationPricesService();

@@ -15,7 +15,7 @@
         MinWidth="220"
         Width="220"
         MouseDown="Window_MouseDown"
-        Icon="../resources/proxy_white.png"
+        Icon="../resources/icon.png"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
         Style="{StaticResource WindowStyle}"
