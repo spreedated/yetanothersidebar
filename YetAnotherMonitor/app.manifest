@@ -16,7 +16,7 @@
             Remove this element if your application requires this virtualization for backwards
             compatibility.
         -->
-        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
       </requestedPrivileges>
     </security>
   </trustInfo>
@@ -42,6 +42,8 @@
       <!-- Windows 10 -->
       <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
 
+      <!-- Windows 11 -->
+      <supportedOS Id="{d4e6a7e1-1da3-43f3-9f74-6b94e57a8fcd}" />
     </application>
   </compatibility>
 

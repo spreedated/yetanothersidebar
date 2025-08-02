@@ -2,22 +2,17 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Docker.DotNet.Models;
 using Hardcodet.Wpf.TaskbarNotification;
 using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
 using Serilog;
 using Services;
+using Services.Models;
 using Services.Models.Responses;
-using SkiaSharp;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using YetAnotherMonitor.Attributes;
 using YetAnotherMonitor.Logic;
+using YetAnotherMonitor.ViewEelements;
 using YetAnotherMonitor.Views;
 
 namespace YetAnotherMonitor.ViewModels
@@ -32,11 +28,8 @@ namespace YetAnotherMonitor.ViewModels
     internal partial class MainWindowViewModel : ObservableObject
     {
         internal readonly RetrieveGasstationPricesService gasstationPricesService;
-        internal readonly MicrophoneService microphoneService;
         internal readonly WeatherApiService weatherApiService;
-        internal readonly NzbService nzbService;
-        internal readonly IssStreamService issService;
-        internal readonly HwInfoService hwService;
+        internal readonly LgDeviceService lgsService;
         internal TaskbarIcon taskbarIcon;
 
         [RelayCommand]
@@ -56,7 +49,6 @@ namespace YetAnotherMonitor.ViewModels
             {
                 await this.gasstationPricesService.Run();
                 await this.weatherApiService.Run();
-                await this.nzbService.Run();
             });
         }
 
@@ -120,15 +112,6 @@ namespace YetAnotherMonitor.ViewModels
         private WeatherApiResponse weatherResponse;
 
         [ObservableProperty]
-        private MicrophoneResponse microphoneResponse;
-
-        [ObservableProperty]
-        private NzbResponse _NzbResponse;
-
-        [ObservableProperty]
-        private IssResponse issResponse;
-
-        [ObservableProperty]
         private BindingList<float> hwInfoCpuLoad;
 
         [ObservableProperty]
@@ -145,6 +128,9 @@ namespace YetAnotherMonitor.ViewModels
 
         public object Sync { get; } = new object();
         private int _time = 0;
+
+        [ObservableProperty]
+        private LgsDeviceResponse lgsResponse;
         #endregion
 
         public MainWindowViewModel()
@@ -154,30 +140,18 @@ namespace YetAnotherMonitor.ViewModels
                 IconSource = new BitmapImage(new Uri(@"pack://application:,,,/resources/proxy_white.ico", UriKind.Absolute))
             };
 
-            this.issService = new();
-            this.issService.Start();
-            this.issService.DataUpdated += this.IssDataUpdated;
-
-            this.nzbService = new();
-            this.nzbService.Start();
-            this.nzbService.DataUpdated += this.NzbDataUpdated;
-
             this.gasstationPricesService = new RetrieveGasstationPricesService();
             this.gasstationPricesService.Start();
             this.gasstationPricesService.DataUpdated += this.GaspricesDataUpdated;
             this.gasstationPricesService.Error += this.GaspricesDataErrorOccurred;
 
-            this.microphoneService = new MicrophoneService();
-            this.microphoneService.Start();
-            this.microphoneService.DataUpdated += this.MicrophoneDataUpdated;
-
             this.weatherApiService = new WeatherApiService(RuntimeStorage.Configuration.RuntimeConfiguration.WeatherApiComApiKey);
             this.weatherApiService.Start();
             this.weatherApiService.DataUpdated += this.WeatherDataUpdated;
 
-            this.hwService = new();
-            this.hwService.Start();
-            this.hwService.DataUpdated += this.HwDataUpdated;
+            this.lgsService = new LgDeviceService();
+            this.lgsService.Start();
+            this.lgsService.DataUpdated += this.LgsDataUpdated;
 
             this.CpuLoadSeries = [ new LineSeries<float>()
                                 {
@@ -205,76 +179,27 @@ namespace YetAnotherMonitor.ViewModels
                 }
             ];
 
-            //Task.Run(async () =>
-            //{
-            //    await this.gasstationPricesService.Run();
-            //});
+            Task.Run(async () =>
+            {
+                await this.gasstationPricesService.Run();
+            });
 
-            //Task.Run(async () =>
-            //{
-            //    await this.microphoneService.Run();
-            //});
-
-            //Task.Run(async () =>
-            //{
-            //    await this.weatherApiService.Run();
-            //});
-
-            //Task.Run(async () =>
-            //{
-            //    await this.nzbService.Run();
-            //});
-
-            //Task.Run(async () =>
-            //{
-            //    await this.issService.Run();
-            //});
 
             Task.Run(async () =>
             {
-                await this.hwService.Run();
+                await this.weatherApiService.Run();
             });
-        }
 
-        [ServiceEvent(typeof(HwInfoService), ServiceEventAttribute.ServiceEventTypes.Updated)]
-        private void HwDataUpdated(object sender, EventArgs e)
-        {
-            this.HwInfoCpuLoad ??= [];
-            lock (Sync)
+            Task.Run(async () =>
             {
-                this.HwInfoCpuLoad.Add((float)Math.Round(this.hwService.Response.Telemetric.FirstOrDefault(x => x.NameDefault == "Total CPU Usage").ValueNow, 2));
-                _time++;
-                XAxes[0].MinLimit = _time - 60;
-                XAxes[0].MaxLimit = _time;
-            }
-            this.HwInfoCpuPower = (float)Math.Round(this.hwService.Response.Telemetric.FirstOrDefault(x => x.NameDefault == "CPU Package Power").ValueNow, 2);
-
-            this.OnPropertyChanged(nameof(this.HwInfoCpuLoad));
-        }
-
-        [ServiceEvent(typeof(IssStreamService), ServiceEventAttribute.ServiceEventTypes.Updated)]
-        private void IssDataUpdated(object sender, EventArgs e)
-        {
-            this.IssResponse = this.issService.Response;
-            this.OnPropertyChanged(nameof(this.IssResponse));
-        }
-
-        [ServiceEvent(typeof(NzbService), ServiceEventAttribute.ServiceEventTypes.Updated)]
-        private void NzbDataUpdated(object sender, EventArgs e)
-        {
-            this.NzbResponse = this.nzbService.Response;
+                await this.lgsService.Run();
+            });
         }
 
         [ServiceEvent(typeof(WeatherApiService), ServiceEventAttribute.ServiceEventTypes.Updated)]
         private void WeatherDataUpdated(object sender, EventArgs e)
         {
             this.WeatherResponse = this.weatherApiService.Response;
-        }
-
-        [ServiceEvent(typeof(MicrophoneService), ServiceEventAttribute.ServiceEventTypes.Updated)]
-        private void MicrophoneDataUpdated(object sender, EventArgs e)
-        {
-            this.MicrophoneResponse = this.microphoneService.Response;
         }
 
         [ServiceEvent(typeof(RetrieveGasstationPricesService), ServiceEventAttribute.ServiceEventTypes.Error)]
@@ -293,6 +218,37 @@ namespace YetAnotherMonitor.ViewModels
             base.OnPropertyChanged(nameof(this.GaspriceData));
             this.ItemVisibilityPR = Visibility.Visible;
             this.NoConnectionVisiblePR = Visibility.Collapsed;
+        }
+
+        [ServiceEvent(typeof(LgDeviceService), ServiceEventAttribute.ServiceEventTypes.Updated)]
+        private void LgsDataUpdated(object sender, EventArgs e)
+        {
+            this.LgsResponse = this.lgsService.Response;
+            base.OnPropertyChanged(nameof(this.LgsResponse));
+
+            if (this.Instance == null)
+            {
+                while (this.Instance == null || this.LgsResponse == null || this.LgsResponse.Devices.Count <= 0)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+
+            this.Instance.Dispatcher.Invoke(() =>
+            {
+                ((MainWindow)this.Instance).LgsStackPanel.Children.Clear();
+
+                foreach (LogitechDevice d in this.LgsResponse.Devices)
+                {
+                    LgsDeviceElement lde = new()
+                    {
+                        LogitechDevice = d
+                    };
+
+                    ((MainWindow)this.Instance).LgsStackPanel.Children.Add(lde);
+                }
+            });
+
         }
 
         public void DisposeNotifyIcon()

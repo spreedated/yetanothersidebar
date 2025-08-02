@@ -21,6 +21,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Battery.png" />
+    <None Remove="Resources\Battery_dark.png" />
+    <None Remove="Resources\Charging.png" />
+    <None Remove="Resources\Charging_dark.png" />
+    <None Remove="Resources\Headset.png" />
+    <None Remove="Resources\Headset_dark.png" />
+    <None Remove="Resources\Indicator_10.png" />
+    <None Remove="Resources\Indicator_100.png" />
+    <None Remove="Resources\Indicator_30.png" />
+    <None Remove="Resources\Indicator_50.png" />
+    <None Remove="Resources\Keyboard.png" />
+    <None Remove="Resources\Keyboard_dark.png" />
+    <None Remove="Resources\logo_black.ico" />
+    <None Remove="Resources\Missing.png" />
+    <None Remove="Resources\Missing_dark.png" />
+    <None Remove="Resources\Mouse.png" />
+    <None Remove="Resources\Mouse_dark.png" />
     <None Remove="Resources\proxy.ico" />
     <None Remove="Resources\proxy.png" />
     <None Remove="Resources\proxy_white.ico" />
@@ -46,11 +63,11 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Coolicons" Version="5.1.0" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="5.1.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Coolicons" Version="6.0.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks.Material" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Serilog" Version="4.3.0" />
@@ -79,6 +96,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Battery.png" />
+    <Resource Include="Resources\Battery_dark.png" />
+    <Resource Include="Resources\Charging.png" />
+    <Resource Include="Resources\Charging_dark.png" />
+    <Resource Include="Resources\Headset.png" />
+    <Resource Include="Resources\Headset_dark.png" />
+    <Resource Include="Resources\Indicator_10.png" />
+    <Resource Include="Resources\Indicator_100.png" />
+    <Resource Include="Resources\Indicator_30.png" />
+    <Resource Include="Resources\Indicator_50.png" />
+    <Resource Include="Resources\Keyboard.png" />
+    <Resource Include="Resources\Keyboard_dark.png" />
+    <Resource Include="Resources\logo_black.ico" />
+    <Resource Include="Resources\Missing.png" />
+    <Resource Include="Resources\Missing_dark.png" />
+    <Resource Include="Resources\Mouse.png" />
+    <Resource Include="Resources\Mouse_dark.png" />
     <Resource Include="Resources\proxy.ico" />
     <Resource Include="Resources\proxy.png" />
     <Resource Include="Resources\proxy_white.ico" />
