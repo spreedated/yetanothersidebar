@@ -12,6 +12,7 @@ using Services.Models.Responses;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -236,16 +237,41 @@ namespace YetAnotherMonitor.ViewModels
 
             this.Instance.Dispatcher.Invoke(() =>
             {
-                ((MainWindow)this.Instance).LgsStackPanel.Children.Clear();
+                StackPanel p = ((MainWindow)this.Instance).LgsStackPanel;
+
+                if (p.Children.Count != this.LgsResponse.Devices.Count)
+                {
+                    p.Children.Clear();
+
+                    foreach (LogitechDevice d in this.LgsResponse.Devices)
+                    {
+                        LgsDeviceElement lde = new()
+                        {
+                            LogitechDevice = d
+                        };
+
+                        p.Children.Add(lde);
+                    }
+
+                    return;
+                }
 
                 foreach (LogitechDevice d in this.LgsResponse.Devices)
                 {
-                    LgsDeviceElement lde = new()
-                    {
-                        LogitechDevice = d
-                    };
+                    LgsDeviceElement k = p.Children.OfType<LgsDeviceElement>().FirstOrDefault(x => x.LogitechDevice.DeviceId == d.DeviceId);
 
-                    ((MainWindow)this.Instance).LgsStackPanel.Children.Add(lde);
+                    if (k == null)
+                    {
+                        LgsDeviceElement lde = new()
+                        {
+                            LogitechDevice = d
+                        };
+                        p.Children.Add(lde);
+                    }
+                    else
+                    {
+                        k.LogitechDevice = d;
+                    }
                 }
             });
 

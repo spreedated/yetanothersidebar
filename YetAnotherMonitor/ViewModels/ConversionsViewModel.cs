@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using YetAnotherMonitor.Views.Pages;

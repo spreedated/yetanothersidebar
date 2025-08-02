@@ -1,20 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Services.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using YetAnotherMonitor.Views;
 
 namespace YetAnotherMonitor.ViewEelements
 {
@@ -29,9 +19,9 @@ namespace YetAnotherMonitor.ViewEelements
             set
             {
                 base.SetValue(LogitechDeviceProperty, value);
-                this.SetBatteryIndiciator();
+                this.SetBatteryIndicator();
                 this.SetDeviceType();
-                this.IsCharging = value.PowerSupplyStatus == Services.PowerSupplyStatus.POWER_SUPPLY_STATUS_CHARGING ? Visibility.Visible : Visibility.Hidden;
+                this.IsCharging = value.PowerSupplyStatus == Services.PowerSupplyStatus.POWER_SUPPLY_STATUS_CHARGING ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -42,12 +32,14 @@ namespace YetAnotherMonitor.ViewEelements
         private ImageSource deviceType;
 
         [ObservableProperty]
-        private Visibility isCharging = Visibility.Hidden;
+        private Visibility isCharging = Visibility.Collapsed;
 
+        #region Ctor
         public LgsDeviceElement()
         {
             this.InitializeComponent();
         }
+        #endregion
 
         private void SetDeviceType()
         {
@@ -67,7 +59,7 @@ namespace YetAnotherMonitor.ViewEelements
             }
         }
 
-        private void SetBatteryIndiciator()
+        private void SetBatteryIndicator()
         {
             if (this.LogitechDevice.BatteryPercentage >= 91)
             {
