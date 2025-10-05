@@ -31,6 +31,7 @@ namespace YetAnotherMonitor.ViewModels
         internal readonly RetrieveGasstationPricesService gasstationPricesService;
         internal readonly WeatherApiService weatherApiService;
         internal readonly LgDeviceService lgsService;
+        internal readonly FpvDroneApiService fpvService;
         internal TaskbarIcon taskbarIcon;
 
         [RelayCommand]
@@ -113,6 +114,9 @@ namespace YetAnotherMonitor.ViewModels
         private WeatherApiResponse weatherResponse;
 
         [ObservableProperty]
+        private FpvDroneResponse fpvResponse;
+
+        [ObservableProperty]
         private BindingList<float> hwInfoCpuLoad;
 
         [ObservableProperty]
@@ -149,6 +153,10 @@ namespace YetAnotherMonitor.ViewModels
             this.weatherApiService = new WeatherApiService(RuntimeStorage.Configuration.RuntimeConfiguration.WeatherApiComApiKey);
             this.weatherApiService.Start();
             this.weatherApiService.DataUpdated += this.WeatherDataUpdated;
+
+            this.fpvService = new();
+            this.fpvService.Start();
+            this.fpvService.DataUpdated += this.FpvDataUpdated;
 
             this.lgsService = new LgDeviceService();
             this.lgsService.Start();
@@ -195,6 +203,17 @@ namespace YetAnotherMonitor.ViewModels
             {
                 await this.lgsService.Run();
             });
+
+            Task.Run(async () =>
+            {
+                await this.fpvService.Run();
+            });
+        }
+
+        [ServiceEvent(typeof(FpvDroneApiService), ServiceEventAttribute.ServiceEventTypes.Updated)]
+        private void FpvDataUpdated(object sender, EventArgs e)
+        {
+            this.FpvResponse = this.fpvService.Response;
         }
 
         [ServiceEvent(typeof(WeatherApiService), ServiceEventAttribute.ServiceEventTypes.Updated)]
