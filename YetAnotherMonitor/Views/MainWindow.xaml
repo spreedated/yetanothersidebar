@@ -290,9 +290,14 @@
                             <Label Content="{Binding FpvResponse.ExpressLRS}" FontWeight="Bold"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,-8">
                             <Label Content="EdgeTX:"/>
                             <Label Content="{Binding FpvResponse.EdgeTX}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <Label Content="WhoopStor V3:"/>
+                            <Label Content="{Binding FpvResponse.Whoopstor3}" FontWeight="Bold"/>
                         </StackPanel>
 
                         <Canvas Margin="0,0,0,4" />
