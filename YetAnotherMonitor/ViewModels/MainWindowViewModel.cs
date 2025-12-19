@@ -28,10 +28,11 @@ namespace YetAnotherMonitor.ViewModels
 {
     internal partial class MainWindowViewModel : ObservableObject
     {
-        internal readonly RetrieveGasstationPricesService gasstationPricesService;
+        //internal readonly RetrieveGasstationPricesService gasstationPricesService;
         internal readonly WeatherApiService weatherApiService;
         internal readonly LgDeviceService lgsService;
         internal readonly FpvDroneApiService fpvService;
+        internal readonly SoftwareApiService softwareService;
         internal TaskbarIcon taskbarIcon;
 
         [RelayCommand]
@@ -49,7 +50,7 @@ namespace YetAnotherMonitor.ViewModels
         {
             Task.Run(async () =>
             {
-                await this.gasstationPricesService.Run();
+                //await this.gasstationPricesService.Run();
                 await this.weatherApiService.Run();
             });
         }
@@ -136,6 +137,9 @@ namespace YetAnotherMonitor.ViewModels
 
         [ObservableProperty]
         private LgsDeviceResponse lgsResponse;
+
+        [ObservableProperty]
+        private SoftwareResponse softwareResponse;
         #endregion
 
         public MainWindowViewModel()
@@ -145,10 +149,10 @@ namespace YetAnotherMonitor.ViewModels
                 IconSource = new BitmapImage(new Uri(@"pack://application:,,,/resources/icon.ico", UriKind.Absolute))
             };
 
-            this.gasstationPricesService = new RetrieveGasstationPricesService();
-            this.gasstationPricesService.Start();
-            this.gasstationPricesService.DataUpdated += this.GaspricesDataUpdated;
-            this.gasstationPricesService.Error += this.GaspricesDataErrorOccurred;
+            //this.gasstationPricesService = new RetrieveGasstationPricesService();
+            //this.gasstationPricesService.Start();
+            //this.gasstationPricesService.DataUpdated += this.GaspricesDataUpdated;
+            //this.gasstationPricesService.Error += this.GaspricesDataErrorOccurred;
 
             this.weatherApiService = new WeatherApiService(RuntimeStorage.Configuration.RuntimeConfiguration.WeatherApiComApiKey);
             this.weatherApiService.Start();
@@ -157,6 +161,13 @@ namespace YetAnotherMonitor.ViewModels
             this.fpvService = new();
             this.fpvService.Start();
             this.fpvService.DataUpdated += this.FpvDataUpdated;
+
+            this.softwareService = new();
+            this.softwareService.Start();
+            this.softwareService.DataUpdated += (s, e) =>
+            {
+                this.SoftwareResponse = this.softwareService.Response;
+            };
 
             this.lgsService = new LgDeviceService();
             this.lgsService.Start();
@@ -188,10 +199,10 @@ namespace YetAnotherMonitor.ViewModels
                 }
             ];
 
-            Task.Run(async () =>
-            {
-                await this.gasstationPricesService.Run();
-            });
+            //Task.Run(async () =>
+            //{
+            //    await this.gasstationPricesService.Run();
+            //});
 
 
             Task.Run(async () =>
@@ -207,6 +218,11 @@ namespace YetAnotherMonitor.ViewModels
             Task.Run(async () =>
             {
                 await this.fpvService.Run();
+            });
+
+            Task.Run(async () =>
+            {
+                await this.softwareService.Run();
             });
         }
 
@@ -231,14 +247,14 @@ namespace YetAnotherMonitor.ViewModels
             this.NoConnectionVisiblePR = Visibility.Visible;
         }
 
-        [ServiceEvent(typeof(RetrieveGasstationPricesService), ServiceEventAttribute.ServiceEventTypes.Updated)]
-        private void GaspricesDataUpdated(object sender, EventArgs e)
-        {
-            this.GaspriceData = this.gasstationPricesService.Response;
-            base.OnPropertyChanged(nameof(this.GaspriceData));
-            this.ItemVisibilityPR = Visibility.Visible;
-            this.NoConnectionVisiblePR = Visibility.Collapsed;
-        }
+        //[ServiceEvent(typeof(RetrieveGasstationPricesService), ServiceEventAttribute.ServiceEventTypes.Updated)]
+        //private void GaspricesDataUpdated(object sender, EventArgs e)
+        //{
+        //    this.GaspriceData = this.gasstationPricesService.Response;
+        //    base.OnPropertyChanged(nameof(this.GaspriceData));
+        //    this.ItemVisibilityPR = Visibility.Visible;
+        //    this.NoConnectionVisiblePR = Visibility.Collapsed;
+        //}
 
         [ServiceEvent(typeof(LgDeviceService), ServiceEventAttribute.ServiceEventTypes.Updated)]
         private void LgsDataUpdated(object sender, EventArgs e)
