@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "neXn.Lib.ConfigurationHandler/10.0.1": {
+        "runtime": {
+          "neXn.Lib.ConfigurationHandler.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "neXn.Lib.ConfigurationHandler/10.0.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

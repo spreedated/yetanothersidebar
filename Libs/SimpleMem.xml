@@ -1,0 +1,468 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SimpleMem</name>
+    </assembly>
+    <members>
+        <member name="P:SimpleMem.Exceptions.ErrorCodes.CodeLookup">
+            <summary>
+             Lookup dictionary for relevant error codes and their meanings.
+            </summary>
+        </member>
+        <member name="T:SimpleMem.Exceptions.MemoryReadException">
+            <summary>
+             Thrown when memory read operations have failed.
+             Intended to be used as a support tool for hard-to-debug issues.
+            </summary>
+        </member>
+        <member name="T:SimpleMem.Exceptions.MemoryWriteException">
+            <summary>
+             Thrown when memory write operations have failed.
+             Intended to be used as a support tool for hard-to-debug issues.
+            </summary>
+        </member>
+        <member name="T:SimpleMem.Extensions.MemoryExtensions">
+            <summary>
+            Extensions for Memory
+            </summary>
+        </member>
+        <member name="M:SimpleMem.Extensions.MemoryExtensions.StaticOffset(SimpleMem.Memory,System.Int32)">
+            <summary>
+            Extension that serves as a wrapper for mem.ModuleBaseAddress + offset.
+            Useful for storing lots of static offsets that derive directly from
+            the ModuleBaseAddress (these are not the same as pointers, although they are similar).
+            </summary>
+            <param name="mem">The memory instance in which the base address exists</param>
+            <param name="offset">Any address</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleMem.Extensions.MemoryExtensions.StaticOffset(SimpleMem.Memory,System.Int64)">
+            <inheritdoc cref="M:SimpleMem.Extensions.MemoryExtensions.StaticOffset(SimpleMem.Memory,System.Int32)"/> 
+        </member>
+        <member name="T:SimpleMem.Extensions.PointerExtensions">
+            <summary>
+            Extensions for MultiLevelPtr
+            </summary>
+        </member>
+        <member name="M:SimpleMem.Extensions.PointerExtensions.ReadValue``1(SimpleMem.MultiLevelPtr,SimpleMem.Memory)">
+            <summary>
+             Reads the value, in memory, of this <see cref="!:MultiLevelPtr&lt;T&gt;" />. This extension saves
+             a separate call to <see cref="M:SimpleMem.Memory.ReadAddressFromMlPtr(SimpleMem.MultiLevelPtr)" />.
+            </summary>
+            <param name="mlPtr">The <see cref="!:MultiLevelPtr&lt;T&gt;" /> to read the value from</param>
+            <param name="mem">The <see cref="T:SimpleMem.Memory" /> instance in which this value lays</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleMem.Extensions.PointerExtensions.WriteValue``1(SimpleMem.MultiLevelPtr,SimpleMem.Memory,``0)">
+            <summary>
+            Writes the value in the same fashion as <see cref="M:SimpleMem.Memory.WriteMemory``1(System.IntPtr,``0)"/>
+            </summary>
+        </member>
+        <member name="M:SimpleMem.Extensions.PointerExtensions.WriteBytes(SimpleMem.MultiLevelPtr,SimpleMem.Memory,System.Byte[])">
+            <summary>
+            Writes the bytes to memory at the address resolved from the MultiLevelPtr.
+            </summary>
+            <returns>The number of bytes written</returns>
+        </member>
+        <member name="M:SimpleMem.Extensions.PointerExtensions.GetAddress(SimpleMem.MultiLevelPtr,SimpleMem.Memory)">
+            <summary>
+             Gets the address resolved from the given mlPtr.
+            </summary>
+            <param name="mlPtr">The <see cref="T:SimpleMem.MultiLevelPtr" /> to read the address from</param>
+            <param name="mem">The <see cref="T:SimpleMem.Memory" /> instance in which this address lays</param>
+            <returns>A IntPtr containing the address, if found.</returns>
+        </member>
+        <member name="M:SimpleMem.HelperFunctions.WriteProcessMemory(System.IntPtr,System.IntPtr,System.Byte*,System.Int32,System.Boolean)">
+            <summary>
+             Wrapper for kernel32.dll WriteProcessMemory. Calls VirtualProtectEx() on memory to
+             allow writing to protected memory.
+            </summary>
+            <param name="hProcess"></param>
+            <param name="lpBaseAddress"></param>
+            <param name="lpBuffer"></param>
+            <param name="dwSize"></param>
+            <param name="isProtected">
+             Whether the memory address space to write to has been
+             vetted by a VirtualProtectEx call
+            </param>
+            <returns>Number of bytes read</returns>
+            <exception cref="T:SimpleMem.Exceptions.MemoryWriteException">Thrown if the memory failed to be written</exception>
+        </member>
+        <member name="M:SimpleMem.HelperFunctions.ReadProcessMemory(System.IntPtr,System.IntPtr,System.Byte*,System.Int32,System.Boolean)">
+            <summary>
+             Wrapper for kernel32.dll ReadProcessMemory
+            </summary>
+            <param name="hProcess"></param>
+            <param name="lpBaseAddress"></param>
+            <param name="lpBuffer"></param>
+            <param name="dwSize"></param>
+            <param name="isProtected">Whether the memory access is processed by a VirtualProtectEx call</param>
+            <returns>Number of bytes read</returns>
+        </member>
+        <member name="M:SimpleMem.HelperFunctions.GetProcess(System.String)">
+            <summary>
+             Gets the process (if possible) based on the class's processName.
+            </summary>
+            <exception cref="T:System.DllNotFoundException">Thrown if the process is not found.</exception>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleMem.HelperFunctions.GetProcessList">
+            <summary>
+             Returns a list of all currently running executables' process names (regardless of architecture).
+             The names of these processes can be used as the processName <see cref="T:SimpleMem.Memory" /> constructor argument.
+            </summary>
+        </member>
+        <member name="T:SimpleMem.Memory">
+            <summary>
+             Class for cross-architecture memory manipulation.
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.ProcessAccessLevel">
+            <summary>
+             The user-defined desired access level for which the process was opened under.
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.Process">
+            <summary>
+             The current process
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.ProcessHandle">
+            <summary>
+             Pointer to the handle of the opened process in memory.
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.PtrSize">
+            <summary>
+             The size of pointers for this process.
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.Module">
+            <summary>
+             Module assosciated with the provided moduleName, or the process's MainModule by default.
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.ModuleBaseAddress">
+            <summary>
+             Base address of the module
+            </summary>
+        </member>
+        <member name="P:SimpleMem.Memory.ModuleBaseAddressHex">
+            <summary>
+             ModuleBaseAddress in hex form. Casting ModuleBaseAddress .ToString() directly returns a base-10 number.
+            </summary>
+        </member>
+        <member name="M:SimpleMem.Memory.#ctor(System.String,System.String,System.Int64)">
+            <summary>
+             Opens a handle to the given processName at the provided moduleName.
+             For example, if I have a process named "FTLGame" and my desired base address
+             is located at "FTLGame.exe" + 0xABCD..., the processName would be "FTLGame" and
+             the moduleName would be "FTLGame.exe".
+            </summary>
+            <param name="processName">
+             The name of the process. Use <see cref="M:SimpleMem.HelperFunctions.GetProcessList" />
+             and find your process name if unsure. That value can be passed in as this parameter.
+            </param>
+            <param name="moduleName">
+             The name of the module to use as the base pointer. This defaults to your
+             application's executable if left null.
+            </param>
+            <param name="accessLevel">
+             The desired access level.
+             The minimum required for reading is AccessLevel.READ and the minimum required
+             for writing is AccessLevel.WRITE | AccessLevel.OPERATION.
+             AccessLevel.ALL_ACCESS gives full read-write access to the process.
+            </param>
+        </member>
+        <member name="M:SimpleMem.Memory.AoBScan(System.String,System.Boolean)">
+            <summary>
+             Array of Byte pattern scan. Allows scanning for an exact array of bytes with wildcard support.
+             Note: Partial wildcards are not supported and will be converted into full wildcards. This has a
+             small possibility of resulting in more matches than desired. (e.g. AB ?1 turns into AB ??)
+            </summary>
+            <param name="pattern">
+             The pattern of bytes to look for. Bytes are separated by spaces.
+             Wildcards (?? symbols) are supported.
+            </param>
+            <param name="once">Whether to abort the scan after the first match.</param>
+            <example>
+             <code>
+             var addresses = AoBScan("03 AD FF ?? ?? ?? 4D");
+             // Returns a list of addresses found (if any) matching the pattern.
+            </code>
+            </example>
+            <exception cref="T:SimpleMem.Exceptions.MemoryReadException">Thrown if marked as once but no matches found.</exception>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleMem.Memory.WriteMemory(System.IntPtr,System.Byte[],System.Boolean)">
+            <summary>
+             Writes the given byte array directly to memory at lpBaseAddress
+            </summary>
+            <param name="lpBaseAddress">The address to overwrite data at</param>
+            <param name="bytes">The bytes to write</param>
+            <param name="isProtected">
+             Whether the memory access is processed by a VirtualProtectEx call.
+             This can resolve some memory access violation errors at a significant speed cost - use sparingly.
+            </param>
+            <returns>Number of bytes written</returns>
+        </member>
+        <member name="M:SimpleMem.Memory.WriteMemory``1(System.IntPtr,``0)">
+            <summary>
+             Overwrites the value at lpBaseAddress with the provided value.
+            </summary>
+            <param name="lpBaseAddress">The address in memory to write to</param>
+            <param name="value">The value to write</param>
+            <returns>The number of bytes written</returns>
+        </member>
+        <member name="M:SimpleMem.Memory.WriteMemory(System.IntPtr,System.Byte[])">
+            <inheritdoc cref="M:SimpleMem.Memory.WriteMemory``1(System.IntPtr,``0)" />
+        </member>
+        <member name="M:SimpleMem.Memory.WriteMemory(System.IntPtr,System.String,System.Boolean,System.Text.Encoding)">
+            <summary>
+             Writes a string to the given address. If the length of value is longer than
+             the maximum length of the string supported by the process at lpBaseAddress,
+             the contents of value will overflow into subsequent addresses and will be
+             truncated by <see cref="M:SimpleMem.Memory.ReadString(System.IntPtr,System.Int32,System.Boolean,System.Text.Encoding)" />.
+            </summary>
+            <example>
+             <code>
+             IntPtr addr = new IntPtr(0xabcd);
+             var mem = new Memory("MyGame");
+             mem.WriteString(addr, "abc"); // Overwrites value at addr with "abc\0".
+             mem.WriteString(addr, "abc", false); // Overwrites first 3 chars at addr with "abc". Other characters are left untouched.
+             </code>
+            </example>
+            <param name="lpBaseAddress">The address in memory to write to</param>
+            <param name="value">The string to write</param>
+            <param name="isNullTerminated">
+             Whether the written string should be null terminated.
+             If false, the value written will overwrite chars beginning from lpBaseAddress through
+             the end of value. See the example for more info.
+            </param>
+            <param name="encoding">The encoding to write the string in. UTF-8 by default.</param>
+            <returns>Number of bytes written</returns>
+        </member>
+        <member name="M:SimpleMem.Memory.WriteMemoryProtected(System.IntPtr,System.Byte[])">
+            <inheritdoc cref="M:SimpleMem.Memory.WriteMemory``1(System.IntPtr,``0)" />
+            This overload can possibly resolve some memory access violation errors at a significant speed cost.
+            Use sparingly.
+        </member>
+        <member name="M:SimpleMem.Memory.ReadMemory``1(System.IntPtr,System.Boolean)">
+            <summary>
+             Reads memory of the desired type from lpBaseAddress.
+            </summary>
+            <param name="lpBaseAddress">The address to read from</param>
+            <param name="isProtected">
+             Whether the memory access is processed by a VirtualProtectEx call.
+             This can resolve some memory access violation errors at a significant speed cost - use sparingly.
+            </param>
+            <typeparam name="T">The type of data to read</typeparam>
+            <returns>The value read from lpBaseAddress</returns>
+            <exception cref="T:System.InvalidOperationException">Type specified could not be read</exception>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadMemory(System.IntPtr,System.ReadOnlySpan{System.Byte},System.Boolean)">
+            <summary>
+             Read memory from lpBaseAddress into the given buffer. The amount of
+             memory read (in bytes) equates to the length of the buffer.
+            </summary>
+            <param name="lpBaseAddress">The address to read from</param>
+            <param name="buffer">The buffer to fill with read data</param>
+            <param name="isProtected">
+             Whether the memory access is processed by a VirtualProtectEx call.
+             This can resolve some memory access violation errors at a significant speed cost - use sparingly.
+            </param>
+            <returns>
+             Number of bytes read
+            </returns>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadMemory(System.IntPtr,System.ReadOnlyMemory{System.Byte},System.Boolean)">
+            <summary>
+             Read memory from lpBaseAddress into the given buffer. The amount of
+             memory read (in bytes) equates to the length of the buffer.
+            </summary>
+            <param name="lpBaseAddress">The address to read from</param>
+            <param name="buffer">The buffer to fill with read data</param>
+            <param name="isProtected">
+             Whether the memory access is processed by a VirtualProtectEx call.
+             This can resolve some memory access violation errors at a significant speed cost - use sparingly.
+            </param>
+            <returns>
+             Number of bytes read
+            </returns>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadString(System.IntPtr,System.Int32,System.Boolean,System.Text.Encoding)">
+            <summary>
+             Reads the specified number of bytes from lpBaseAddress in the specified encoding.
+             The string is expected to start at the provided address. The user is not expected to know
+             the length of the string obtained.
+            </summary>
+            <param name="lpBaseAddress">The address to read from</param>
+            <param name="size">The maximum size of the string in bytes</param>
+            <param name="isNullTerminated">
+             Whether or not to return the first null-terminated string found.
+             If false, returns a string containing the first (size) bytes beginning from lpBaseAddress.
+             For example, if false and size is 255, returns a string with 255 bytes of character data
+             beginning from lpBaseAddress.
+            </param>
+            <param name="encoding">The encoding to process the read string through. UTF-8 by default.</param>
+            <returns>The first string read from lpBaseAddress in UTF-8 encoding, unless otherwise specified.</returns>
+            <exception cref="T:System.InvalidOperationException">A string could not be read from the address.</exception>
+        </member>
+        <member name="M:SimpleMem.Memory.AoBScanFirst(System.String)">
+            <summary>
+             Array of Byte pattern scan. Allows scanning for an exact array of bytes with wildcard support.
+             Note: Partial wildcards are not supported and will be converted into full wildcards. This has a
+             small possibility of resulting in more matches than desired. (e.g. AB ?1 turns into AB ??).
+             This overload of AoBScan returns the first address found. A MemoryReadException is thrown if
+             no matches are found for the byte scan. This is faster than getting a complete AoBScan and then
+             filtering that list.
+            </summary>
+            <param name="pattern">
+             The pattern of bytes to look for. Bytes are separated by spaces.
+             Wildcards (?? symbols) are supported.
+            </param>
+            <example>
+             <code>
+             var addresses = AoBScan("03 AD FF ?? ?? ?? 4D");
+             // Returns a list of addresses found (if any) matching the pattern.
+            </code>
+            </example>
+            <exception cref="T:SimpleMem.Exceptions.MemoryReadException">Thrown if marked as once but no matches found.</exception>
+            <returns>The first match found in the byte scan.</returns>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadAddressFromMlPtr(SimpleMem.MultiLevelPtr)">
+            <summary>
+             Resolves the address from a MultiLevelPtr.
+             <returns>
+              The memory address that results from the end of the pointer
+              Call ReadMemory on this address to retrieve the value located
+              at this address.
+             </returns>
+             <example>
+              <code>
+            var mem = new MemoryModule("MyApplication");
+            // Assuming the resulting value at this offset is an Int32.
+            int[] myItemOffsets = { 0xABCD, 0xA, 0xB, 0xC };
+            int myItemAddress = mem.GetAddressFromMlPtr(new MultiLevelPtr(mem.ModuleBaseAddress, myItemOffsets));
+            var value = mem.ReadMemory&lt;int&gt;(myItemAddress);
+            </code>
+             </example>
+            </summary>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadValueFromMlPtr``1(SimpleMem.MultiLevelPtr)">
+            <summary>
+             Resolves the value from the address found from mlPtr
+            </summary>
+            <param name="mlPtr">The MultiLevelPtr to read from</param>
+            <typeparam name="T">The type of data to read from the address resolved from the MultiLevelPtr.</typeparam>
+            <returns>Value found from the resolved MultiLevelPtr</returns>
+        </member>
+        <member name="M:SimpleMem.Memory.ReadStringFromMlPtr(SimpleMem.MultiLevelPtr,System.Int32,System.Boolean,System.Text.Encoding)">
+            <summary>
+             Reads a string from the address found from mlPtr.
+             <inheritdoc cref="M:SimpleMem.Memory.ReadString(System.IntPtr,System.Int32,System.Boolean,System.Text.Encoding)" />
+            </summary>
+            <param name="mlPtr">The MultiLevelPtr to read from</param>
+            <param name="size">The maximum size of the string in bytes</param>
+            <param name="isNullTerminated">
+             Whether or not to return the first null-terminated string found.
+             If false, returns a string containing the first (size) bytes beginning from lpBaseAddress.
+             For example, if false and size is 255, returns a string with 255 bytes of character data
+             beginning from lpBaseAddress.
+            </param>
+            <param name="encoding">The encoding to process the read string through. UTF-8 by default.</param>
+            <returns>The first string read from lpBaseAddress in UTF-8 encoding, unless otherwise specified.</returns>
+        </member>
+        <member name="T:SimpleMem.Models.ACCESS_LEVEL">
+            <summary>
+             Access level to open a process with
+            </summary>
+        </member>
+        <member name="T:SimpleMem.MultiLevelPtr">
+            <summary>
+             Class for conveniently definining multi-level pointers.
+             Multi-level pointers are used for obtaining values even
+             after restarts of programs (unlike a single,
+             non-static memory address).
+             <example>
+              Consider a game called "MyGame" with a module of "MyGame.exe".
+              "MyGame.exe" is given a memory address that changes with each
+              launch of the program, but all of the values desired (such as
+              gold, points, exp, etc.) lay the same distance away in memory
+              from the module. Say the offset for gold is 0xC and exp is 0xD.
+              A MultiLevelPtr can be created from the "base address" of the module
+              with the offsets being 0xC for gold and 0xD for exp. Assuming the
+              base address and offsets are correct, the desired values will
+              always be returned.
+             </example>
+            </summary>
+        </member>
+        <member name="P:SimpleMem.MultiLevelPtr.Base">
+            <summary>
+             Base address of the pointer chain
+            </summary>
+        </member>
+        <member name="P:SimpleMem.MultiLevelPtr.Offsets">
+            <summary>
+             Optional list of offsets containing pointer offsets (from the provided base).
+            </summary>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.IntPtr,System.IntPtr[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="lpBaseAddress">The address the pointer starts from. This is almost always the ModuleBaseAddress.</param>
+            <param name="offsets">The offsets needed to decipher the chain</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.IntPtr,System.Int32[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="lpBaseAddress">The address the pointer starts from. This is almost always the ModuleBaseAddress.</param>
+            <param name="offsets">The offsets needed to decipher the chain</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(SimpleMem.MultiLevelPtr,System.Int32[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+             Creates a multi level pointer from an existing one, then adds
+             the provided offsets to the old baseMlPtr's offsets list.
+            </summary>
+            <param name="baseMlPtr">The previous MultiLevelPtr to base this one from</param>
+            <param name="offsets">Collection of offsets to append to the old base offsets</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(SimpleMem.MultiLevelPtr,System.Int64[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+             Creates a multi level pointer from an existing one, then adds
+             the provided offsets to the old baseMlPtr's offsets list.
+            </summary>
+            <param name="baseMlPtr">The previous MultiLevelPtr to base this one from</param>
+            <param name="offsets">Collection of offsets to append to the old base offsets</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.Int64,System.Int32[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="lpBaseAddress">The address the pointer starts from. This is almost always the ModuleBaseAddress.</param>
+            <param name="offsets">The offsets needed to decipher the chain</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.IntPtr[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="pointers">A chain of pointers to resolve</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.Int32[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="pointers">A chain of pointers to resolve</param>
+        </member>
+        <member name="M:SimpleMem.MultiLevelPtr.#ctor(System.Int64[])">
+            <summary>
+             <inheritdoc cref="T:SimpleMem.MultiLevelPtr" />
+            </summary>
+            <param name="pointers">A chain of pointers to resolve</param>
+        </member>
+    </members>
+</doc>

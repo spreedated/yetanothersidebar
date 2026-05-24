@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyTitle>Conversion Tools</AssemblyTitle>
+    <AssemblyName>ConversionTools</AssemblyName>
+    <Version>1.0.0</Version>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>convtools.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+</Project>

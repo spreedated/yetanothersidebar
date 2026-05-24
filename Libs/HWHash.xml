@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>HWHash</name>
+    </assembly>
+    <members>
+        <member name="M:HwHash.HwHash.Start">
+            <summary>
+            Initializes HWHash and starts polling.
+            </summary>
+            <returns>If successful</returns>
+        </member>
+        <member name="M:HwHash.HwHash.Stop">
+            <summary>
+            Stops the polling loop.
+            </summary>
+        </member>
+        <member name="M:HwHash.HwHash.GetHWHashStats">
+            <summary>
+            Returns collection statistics (includes elapsed milliseconds and raw ticks).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HwHash.HwHash.GetJsonString(System.Boolean)">
+            <summary>
+            Returns JSON-serialized sensor data. If order==true, returns sensors in display order.
+            </summary>
+            <param name="order">Should be ordered?</param>
+            <returns></returns>
+        </member>
+        <member name="M:HwHash.HwHash.GetJsonStringMini(System.Boolean)">
+            <summary>
+            Returns JSON-serialized minified sensor data. If order==true, returns sensors in display order.
+            </summary>
+            <param name="order">Should be ordered?</param>
+            <returns></returns>
+        </member>
+        <member name="M:HwHash.HwHash.GetOrderedList">
+            <summary>
+            Returns sensors ordered by display index.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HwHash.HwHash.GetOrderedListMini">
+            <summary>
+            Returns minified sensors ordered by display index.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:HwHash.HwHash.GetRelevantList">
+            <summary>
+            Returns only relevant sensors.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:HwHash.Models.LaunchOptions.DelayMs">
+            <summary>
+            Sets the delay in milliseconds between sensor readings. Can be changed at runtime.<br/><br/>
+            Valid range is 20 to 60000 ms.
+            </summary>
+        </member>
+        <member name="P:HwHash.Models.LaunchOptions.HighPriority">
+            <summary>
+            Unused, reserved for future use.
+            </summary>
+        </member>
+        <member name="P:HwHash.Models.LaunchOptions.HighPrecision">
+            <summary>
+            Sets the TimeBeginPeriod and TimeEndPeriod to 1 ms for higher precision readings.
+            </summary>
+        </member>
+        <member name="M:HwHash.PrecompiledRegexes.HwinfoProcess">
+            <remarks>
+            Pattern:<br/>
+            <code>hwinfo(?:32|64)?</code><br/>
+            Options:<br/>
+            <code>RegexOptions.IgnoreCase</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match a character in the set [Hh].<br/>
+            ○ Match a character in the set [Ww].<br/>
+            ○ Match a character in the set [Ii].<br/>
+            ○ Match a character in the set [Nn].<br/>
+            ○ Match a character in the set [Ff].<br/>
+            ○ Match a character in the set [Oo].<br/>
+            ○ Optional (greedy).<br/>
+                ○ Match with 2 alternative expressions, atomically.<br/>
+                    ○ Match the string "32".<br/>
+                    ○ Match the string "64".<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.HwinfoProcess_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the HwinfoProcess method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.HwinfoProcess_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.HwinfoProcess_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.HwinfoProcess_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32)">
+            <summary>Pushes 1 value onto the backtracking stack.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_indexOfString_hwinfo_OrdinalIgnoreCase">
+            <summary>Supports searching for the string "hwinfo".</summary>
+        </member>
+    </members>
+</doc>
