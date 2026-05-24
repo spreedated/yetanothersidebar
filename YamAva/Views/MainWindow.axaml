@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ve="using:YamAva.ViewElements"
         xmlns:li="using:neXn.Ui.Avalonia"
+        xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         mc:Ignorable="d"
         x:Class="YamAva.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -17,7 +18,8 @@
         Closing="Window_Closing"
         SizeToContent="Height"
         WindowStartupLocation="Manual"
-        Title="{Binding Title}">
+        Title="{Binding Title}"
+        Topmost="{Binding TopMostEnabled}">
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
@@ -26,6 +28,12 @@
     <Window.ContextMenu>
         <ContextMenu>
           <MenuItem Header="_Open config folder" Command="{Binding OpenConfigFolderCommand}"/>
+        <Separator/>
+            <MenuItem Header="_Top Most" Command="{Binding ToggleTopMostCommand}">
+                <MenuItem.Icon>
+                    <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding TopMostEnabled, Mode=TwoWay}"/>
+                </MenuItem.Icon>
+            </MenuItem>
         <Separator/>
           <MenuItem Header="E_xit" Command="{Binding CloseApplicationCommand}"/>
         </ContextMenu>
@@ -63,7 +71,7 @@
                         </Border>
 
                         <StackPanel Orientation="Vertical">
-                            <Image Source="{Binding WeatherResponse.WeatherCurrent.Condition.IconAdress}" MaxHeight="64" Margin="-10" />
+                            <Image asyncImageLoader:ImageLoader.Source="{Binding WeatherResponse.WeatherCurrent.Condition.IconAdress}" MaxHeight="64" Margin="-10" />
                             <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Condition.Text, Mode=OneWay}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="-5" />
                         </StackPanel>
                         <StackPanel Orientation="Vertical" Margin="12,0,0,0">

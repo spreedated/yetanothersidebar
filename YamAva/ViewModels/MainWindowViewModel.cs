@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using neXn.Ui.Avalonia;
@@ -34,6 +35,9 @@ namespace YamAva.ViewModels
 
         [ObservableProperty]
         public partial string Status { get; set; }
+
+        [ObservableProperty]
+        public partial bool TopMostEnabled { get; set; }
 
         #region Ctor
         public MainWindowViewModel() : base("MainWindowViewModel")
@@ -107,6 +111,8 @@ namespace YamAva.ViewModels
 
             if (!Design.IsDesignMode)
             {
+                this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
+
                 this.OnInstallledSoftwareTimerElapsed(this, null);
 
                 _installedSoftwareTimer = new()
@@ -117,7 +123,7 @@ namespace YamAva.ViewModels
                 _installedSoftwareTimer.Elapsed += this.OnInstallledSoftwareTimerElapsed;
                 _installedSoftwareTimer.Start();
 
-                this.lgsService = new LgDeviceService();
+                this.lgsService = new();
                 this.lgsService.Start();
                 this.lgsService.DataUpdated += this.LgsDataUpdated;
 
@@ -172,6 +178,15 @@ namespace YamAva.ViewModels
                 FileName = Globals.AppLocalBaseUserPath,
                 UseShellExecute = true
             });
+        }
+
+        [RelayCommand]
+        private void ToggleTopMost()
+        {
+            Globals.UserConfig.RuntimeConfiguration.TopMost ^= true;
+            this.Instance.Topmost = Globals.UserConfig.RuntimeConfiguration.TopMost;
+            this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
+            Task.Run(async () => await Globals.UserConfig.Save());
         }
 
         #region Logitech Devices
