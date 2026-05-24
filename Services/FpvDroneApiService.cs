@@ -46,17 +46,15 @@ namespace Services
 
             Task<Version> e = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/ExpressLRS/ExpressLRS/releases/latest"));
             Task<Version> bfw = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/betaflight/betaflight/releases/latest"));
-            Task<Version> bfc = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/betaflight/betaflight-configurator/releases/latest"));
             Task<Version> etx = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/EdgeTX/EdgeTX/releases/latest"));
             Task<Version> bjay = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/bird-sanctuary/bluejay/releases/latest"));
             Task<Version> whoop = Task.Run<Version>(() => ReadWhoopstor3Scraper());
 
-            await Task.WhenAll(e, bfw, bfc, etx, bjay, whoop);
+            await Task.WhenAll(e, bfw, etx, bjay, whoop);
 
             res.ExpressLRS = e.Result;
             res.EdgeTX = etx.Result;
             res.BetaflightFw = bfw.Result;
-            res.BetaflightConf = bfc.Result;
             res.BlueJay = bjay.Result;
             res.Whoopstor3 = whoop.Result;
 

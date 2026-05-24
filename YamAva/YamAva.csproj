@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <Authors>Dante Karl Wackermann</Authors>
+    <NoWarn>1701;1702;IDE0063;IDE0290</NoWarn>
+    <Version>1.0.0</Version>
+    <AssemblyName>YamAva</AssemblyName>
+    <RootNamespace>YamAva</RootNamespace>
+    <AssemblyTitle>Avalonia Mvvm Template</AssemblyTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Battery.png" />
+    <None Remove="Resources\Battery_dark.png" />
+    <None Remove="Resources\Charging.png" />
+    <None Remove="Resources\Charging_dark.png" />
+    <None Remove="Resources\Headset.png" />
+    <None Remove="Resources\Headset_dark.png" />
+    <None Remove="Resources\icon.ico" />
+    <None Remove="Resources\icon.png" />
+    <None Remove="Resources\Indicator_10.png" />
+    <None Remove="Resources\Indicator_100.png" />
+    <None Remove="Resources\Indicator_30.png" />
+    <None Remove="Resources\Indicator_50.png" />
+    <None Remove="Resources\Keyboard.png" />
+    <None Remove="Resources\Keyboard_dark.png" />
+    <None Remove="Resources\logo_black.ico" />
+    <None Remove="Resources\Missing.png" />
+    <None Remove="Resources\Missing_dark.png" />
+    <None Remove="Resources\Mouse.png" />
+    <None Remove="Resources\Mouse_dark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\Battery.png" />
+    <AvaloniaResource Include="Resources\Battery_dark.png" />
+    <AvaloniaResource Include="Resources\Charging.png" />
+    <AvaloniaResource Include="Resources\Charging_dark.png" />
+    <AvaloniaResource Include="Resources\Headset.png" />
+    <AvaloniaResource Include="Resources\Headset_dark.png" />
+    <AvaloniaResource Include="Resources\icon.ico" />
+    <AvaloniaResource Include="Resources\icon.png" />
+    <AvaloniaResource Include="Resources\Indicator_10.png" />
+    <AvaloniaResource Include="Resources\Indicator_100.png" />
+    <AvaloniaResource Include="Resources\Indicator_30.png" />
+    <AvaloniaResource Include="Resources\Indicator_50.png" />
+    <AvaloniaResource Include="Resources\Keyboard.png" />
+    <AvaloniaResource Include="Resources\Keyboard_dark.png" />
+    <AvaloniaResource Include="Resources\logo_black.ico" />
+    <AvaloniaResource Include="Resources\Missing.png" />
+    <AvaloniaResource Include="Resources\Missing_dark.png" />
+    <AvaloniaResource Include="Resources\Mouse.png" />
+    <AvaloniaResource Include="Resources\Mouse_dark.png" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.16" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Services\Services.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="neXn.Lib.ConfigurationHandler">
+      <HintPath>..\Libs\neXn.Lib.ConfigurationHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Ui">
+      <HintPath>..\Libs\neXn.Ui.dll</HintPath>
+    </Reference>
+    <Reference Include="neXn.Ui.Avalonia">
+      <HintPath>..\Libs\neXn.Ui.Avalonia.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

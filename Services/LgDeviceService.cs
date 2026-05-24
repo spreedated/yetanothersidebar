@@ -1,16 +1,16 @@
-﻿#pragma warning disable S1075
-
-using Services.Models;
+﻿using Services.Models;
 using Services.Models.Responses;
 using System;
 using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
 
 namespace Services
 {
+    [SupportedOSPlatform("windows")]
     public sealed class LgDeviceService : Service<LgsDeviceResponse>
     {
         public LgDeviceService()
