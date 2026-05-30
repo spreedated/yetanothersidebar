@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Services.Models.Responses
+namespace Services.Models
 {
-    public class FpvDroneResponse
+    public record FpvSoftwareVersions
     {
         public Version BetaflightFw { get; set; }
         public Version ExpressLRS { get; set; }

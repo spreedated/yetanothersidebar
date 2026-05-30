@@ -155,27 +155,27 @@
                         <StackPanel Orientation="Vertical" Margin="8,0,8,8">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="BlueJay:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsBluejayLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvResponse.BlueJay}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsBluejayLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvSoftwareVersions.BlueJay}" FontWeight="Bold"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="12" Text="Betaflight FW:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsBetaflightLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvResponse.BetaflightFw}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsBetaflightLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvSoftwareVersions.BetaflightFw}" FontWeight="Bold"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="12" Text="ExpressLRS:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsElrsLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvResponse.ExpressLRS}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsElrsLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvSoftwareVersions.ExpressLRS}" FontWeight="Bold"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="12" Text="EdgeTX:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsEdgeTxLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvResponse.EdgeTX}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsEdgeTxLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvSoftwareVersions.EdgeTX}" FontWeight="Bold"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock FontSize="12" Text="WhoopStor V3:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsWhoopStorLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvResponse.Whoopstor3}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsWhoopStorLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding FpvSoftwareVersions.Whoopstor3}" FontWeight="Bold"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
@@ -214,8 +214,13 @@
 
                         <StackPanel Orientation="Vertical" Margin="8,0,8,8">
                             <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Blender:" FontSize="12"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsBlenderLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding Blender}" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Godot:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsGodotLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding SoftwareResponse.Godot}" FontWeight="Bold"/>
+                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding IsGodotLatest, Converter={vl:BoolToBrushConverter}}" Text="{Binding Godot}" FontWeight="Bold"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>

@@ -1,6 +1,4 @@
-﻿#pragma warning disable S4487
-
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Serilog.Extensions.Logging;
@@ -9,7 +7,7 @@ namespace YamAva.ViewModels
 {
     public abstract partial class ViewModelBase : ObservableObject
     {
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         [ObservableProperty]
         public partial Window Instance { get; set; }

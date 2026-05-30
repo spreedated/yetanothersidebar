@@ -1,48 +1,55 @@
-﻿#pragma warning disable S112
+﻿#pragma warning disable S1075 // Suppress "URIs should not be hardcoded" warning since these are well-known API endpoints that are unlikely to change
 
-using Services.Models.Responses;
-using System;
-using System.Text.Json;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Net;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Services.Models;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Services
+namespace Services.Workers
 {
-    public sealed class FpvDroneApiService : Service<FpvDroneResponse>
+    public class FpvSoftwareWorker : BackgroundService
     {
-        public const string WHOOPSTOR3_URL = "https://viflydrone.com/pages/download-center";
+        private const string WHOOPSTOR3_URL = "https://viflydrone.com/pages/download-center";
 
-        public FpvDroneApiService()
+        private readonly ILogger _logger;
+
+        public FpvSoftwareVersions LatestVersion { get; private set; }
+
+        public event EventHandler<FpvSoftwareVersions> LatestVersionsUpdated;
+
+        public FpvSoftwareWorker(ILogger logger)
         {
-            base.CreateTimer(new TimeSpan(24, 0, 0));
+            _logger = logger;
         }
 
-        internal override void Processor(object sender, ElapsedEventArgs e)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            this.ProcessIsRunning = true;
-            base.RaiseProcessStarted();
-
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                this.GetData().Wait();
-            }
-            catch (Exception ex)
-            {
-                base.RaiseError(ex);
-            }
+                _logger.LogTrace("FpvSoftwareWorker is running.");
+                Stopwatch s = Stopwatch.StartNew();
 
-            this.ProcessIsRunning = false;
-            base.RaiseValuesUpdated();
+                this.LatestVersion = await GetData();
+                this.LatestVersionsUpdated?.Invoke(this, this.LatestVersion);
+
+                s.Stop();
+                _logger.LogTrace("FpvSoftwareWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
+                await Task.Delay(TimeSpan.FromHours(4), stoppingToken);
+            }
         }
 
-        private async Task GetData()
+        private static async Task<FpvSoftwareVersions> GetData()
         {
-            FpvDroneResponse res = new();
+            FpvSoftwareVersions res = new();
 
             Task<Version> e = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/ExpressLRS/ExpressLRS/releases/latest"));
             Task<Version> bfw = Task.Run<Version>(() => ReadVersionFromGithubJson("https://api.github.com/repos/betaflight/betaflight/releases/latest"));
@@ -60,7 +67,7 @@ namespace Services
 
             res.Date = DateTime.UtcNow;
 
-            base.Response = res;
+            return res;
         }
 
         private static async Task<Version> ReadWhoopstor3Scraper()
@@ -127,7 +134,7 @@ namespace Services
 
             if (doc.RootElement.TryGetProperty("tag_name", out JsonElement tag))
             {
-                string v = tag.GetString().Replace("v","");
+                string v = tag.GetString().Replace("v", "");
                 if (Version.TryParse(v, out Version ver))
                 {
                     return ver;

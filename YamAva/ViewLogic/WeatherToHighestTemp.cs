@@ -1,5 +1,5 @@
 ﻿using neXn.Ui.Avalonia.Converter;
-using Services.Models.Responses;
+using Services.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +11,7 @@ namespace YamAva.ViewLogic
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            List<WeatherApiResponse.Forecastday> b = (List<WeatherApiResponse.Forecastday>)value;
+            List<WeatherApi.Forecastday> b = (List<WeatherApi.Forecastday>)value;
             return b.FirstOrDefault()?.Day.MaxtempC;
         }
 

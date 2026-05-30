@@ -1,22 +1,19 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using neXn.Ui.Avalonia;
-using Services;
 using Services.Models;
-using Services.Models.Responses;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using YamAva.Logic;
-using YamAva.Models;
 using YamAva.ViewElements;
 using YamAva.Views;
 
@@ -38,6 +35,26 @@ namespace YamAva.ViewModels
 
         [ObservableProperty]
         public partial bool TopMostEnabled { get; set; }
+
+        [ObservableProperty]
+        public partial Version Blender { get; set; }
+        partial void OnBlenderChanged(Version value)
+        {
+            this.CompareToInstalledSoftware();
+        }
+
+        [ObservableProperty]
+        public partial bool IsBlenderLatest { get; set; }
+
+        [ObservableProperty]
+        public partial Version Godot { get; set; }
+        partial void OnGodotChanged(Version value)
+        {
+            this.CompareToInstalledSoftware();
+        }
+
+        [ObservableProperty]
+        public partial bool IsGodotLatest { get; set; }
 
         #region Ctor
         public MainWindowViewModel() : base("MainWindowViewModel")
@@ -93,13 +110,7 @@ namespace YamAva.ViewModels
                     }
                 };
 
-                this.SoftwareResponse = new()
-                {
-                    Godot = new Version(3, 5, 1),
-                    Date = DateTime.Now
-                };
-
-                this.FpvResponse = new()
+                this.FpvSoftwareVersions = new()
                 {
                     BetaflightFw = new Version(4, 3, 0),
                     BlueJay = new Version(1, 2, 3),
@@ -107,58 +118,62 @@ namespace YamAva.ViewModels
                     ExpressLRS = new Version(2, 3, 4),
                     Whoopstor3 = new Version(1, 0, 0)
                 };
+
+                this.Blender = new(1, 1, 1);
+                this.Godot = new(1, 1, 1);
             }
 
             if (!Design.IsDesignMode)
             {
                 this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
 
-                this.OnInstallledSoftwareTimerElapsed(this, null);
-
-                _installedSoftwareTimer = new()
+                Globals.BackgroundServices.Services.GetService<Services.Workers.BlenderWorker>().LatestVersionUpdated += (s, v) =>
                 {
-                    Interval = TimeSpan.FromMinutes(5).TotalMilliseconds
+                    this.Blender = v;
                 };
 
-                _installedSoftwareTimer.Elapsed += this.OnInstallledSoftwareTimerElapsed;
-                _installedSoftwareTimer.Start();
-
-                this.lgsService = new();
-                this.lgsService.Start();
-                this.lgsService.DataUpdated += this.LgsDataUpdated;
-
-                this.weatherApiService = new WeatherApiService(Globals.UserConfig.RuntimeConfiguration.WeatherApiComApiKey);
-                this.weatherApiService.Start();
-                this.weatherApiService.DataUpdated += this.WeatherDataUpdated;
-
-                this.fpvService = new();
-                this.fpvService.Start();
-                this.fpvService.DataUpdated += this.FpvDataUpdated;
-
-                this.softwareService = new();
-                this.softwareService.Start();
-                this.softwareService.DataUpdated += (s, e) =>
+                Globals.BackgroundServices.Services.GetService<Services.Workers.GodotWorker>().LatestVersionUpdated += (s, v) =>
                 {
-                    this.SoftwareResponse = this.softwareService.Response;
-                    if (this.InstalledSoftware != null && this.InstalledSoftware.Godot.Equals(this.SoftwareResponse.Godot))
+                    this.Godot = v;
+                };
+
+                Globals.BackgroundServices.Services.GetService<Services.Workers.InstalledSoftwareWorker>().InstalledSoftwareUpdated += (s, v) =>
+                {
+                    this.InstalledSoftware = v;
+                };
+
+                Globals.BackgroundServices.Services.GetService<Services.Workers.LgDeviceWorker>().LatestVersionsUpdated += (s, v) =>
+                {
+                    this.LogitechDevices = new ObservableCollection<LogitechDevice>(v);
+
+                    Task.Run(async () =>
                     {
-                        this.IsGodotLatest = true;
-                    }
+                        await Task.Delay(2500);
+                        this.LgsDataUpdated();
+                    });
                 };
 
-                Task.Run(async () =>
+                Globals.BackgroundServices.Services.GetService<Services.Workers.WeatherWorker>().LatestWeatherUpdated += (s, v) =>
                 {
-                    await this.weatherApiService.Run();
-                });
+                    this.WeatherResponse = v;
+                };
 
-                Task.Run(async () =>
+                Globals.BackgroundServices.Services.GetService<Services.Workers.FpvSoftwareWorker>().LatestVersionsUpdated += (s, v) =>
                 {
-                    await this.fpvService.Run();
-                });
+                    this.FpvSoftwareVersions = v;
+                };
 
-                Task.Run(async () =>
+                // Start background services
+                Task.Run(() =>
                 {
-                    await this.softwareService.Run();
+                    foreach (var s in Globals.BackgroundServices.Services.GetServices<IHostedService>())
+                    {
+                        Task.Run(async () =>
+                        {
+                            await s.StartAsync(CancellationToken.None);
+                            _logger?.LogTrace("Started background service {ServiceName}", s.GetType().FullName);
+                        });
+                    }
                 });
             }
         }
@@ -190,19 +205,17 @@ namespace YamAva.ViewModels
         }
 
         #region Logitech Devices
-        internal readonly LgDeviceService lgsService;
         [ObservableProperty]
-        public partial LgsDeviceResponse LgsResponse { get; set; }
+        public partial ObservableCollection<LogitechDevice> LogitechDevices { get; set; }
+
         [ObservableProperty]
         public partial LoadingIndicatorMode LgsLoadingIndicatorMode { get; set; }
-        private void LgsDataUpdated(object sender, EventArgs e)
-        {
-            this.LgsResponse = this.lgsService.Response;
-            base.OnPropertyChanged(nameof(this.LgsResponse));
 
+        private void LgsDataUpdated()
+        {
             if (this.Instance == null)
             {
-                while (this.Instance == null || this.LgsResponse == null || this.LgsResponse.Devices.Count <= 0)
+                while (this.Instance == null || this.LogitechDevices == null || this.LogitechDevices.Count <= 0)
                 {
                     Thread.Sleep(100);
                 }
@@ -212,11 +225,11 @@ namespace YamAva.ViewModels
             {
                 StackPanel p = ((MainWindow)this.Instance).LgsStackPanel;
 
-                if (p.Children.Count != this.LgsResponse.Devices.Count)
+                if (p.Children.Count != this.LogitechDevices.Count)
                 {
                     p.Children.Clear();
 
-                    foreach (LogitechDevice d in this.LgsResponse.Devices)
+                    foreach (LogitechDevice d in this.LogitechDevices)
                     {
                         LgsDeviceElement lde = new()
                         {
@@ -229,7 +242,7 @@ namespace YamAva.ViewModels
                     return;
                 }
 
-                foreach (LogitechDevice d in this.LgsResponse.Devices)
+                foreach (LogitechDevice d in this.LogitechDevices)
                 {
                     LgsDeviceElement k = p.Children.OfType<LgsDeviceElement>().FirstOrDefault(x => x.LogitechDevice.DeviceId == d.DeviceId);
 
@@ -251,48 +264,26 @@ namespace YamAva.ViewModels
         #endregion
 
         #region Weather
-        internal readonly WeatherApiService weatherApiService;
         [ObservableProperty]
-        public partial WeatherApiResponse WeatherResponse { get; set; }
-        private void WeatherDataUpdated(object sender, EventArgs e)
-        {
-            this.WeatherResponse = this.weatherApiService.Response;
-        }
+        public partial WeatherApi WeatherResponse { get; set; }
         #endregion
 
         #region FpvFirmwares
-        internal readonly FpvDroneApiService fpvService;
         [ObservableProperty]
-        public partial FpvDroneResponse FpvResponse { get; set; }
-
-        private void FpvDataUpdated(object sender, EventArgs e)
+        public partial FpvSoftwareVersions FpvSoftwareVersions { get; set; }
+        partial void OnFpvSoftwareVersionsChanged(FpvSoftwareVersions value)
         {
-            this.FpvResponse = this.fpvService.Response;
-
-            if (this.InstalledSoftware != null)
-            {
-                this.IsBluejayLatest = this.FpvResponse.BlueJay.Equals(this.InstalledSoftware.Bluejay);
-                this.IsBetaflightLatest = this.FpvResponse.BetaflightFw.Equals(this.InstalledSoftware.BetaflightFw);
-                this.IsElrsLatest = this.FpvResponse.ExpressLRS.Equals(this.InstalledSoftware.ExpressLrs);
-                this.IsEdgeTxLatest = this.FpvResponse.EdgeTX.Equals(this.InstalledSoftware.EdgeTx);
-                this.IsWhoopStorLatest = this.FpvResponse.Whoopstor3.Equals(this.InstalledSoftware.Whoopstor);
-            }
+            this.CompareToInstalledSoftware();
         }
         #endregion
 
-        #region Software Versions
-        internal readonly SoftwareApiService softwareService;
-        [ObservableProperty]
-        public partial SoftwareResponse SoftwareResponse { get; set; } = new();
-        #endregion
-
         #region Installed Software List
-        private readonly System.Timers.Timer _installedSoftwareTimer;
         [ObservableProperty]
         public partial InstalledSoftware InstalledSoftware { get; set; }
-
-        [ObservableProperty]
-        public partial bool IsGodotLatest { get; set; }
+        partial void OnInstalledSoftwareChanged(InstalledSoftware value)
+        {
+            this.CompareToInstalledSoftware();
+        }
 
         [ObservableProperty]
         public partial bool IsBluejayLatest { get; set; }
@@ -308,11 +299,22 @@ namespace YamAva.ViewModels
 
         [ObservableProperty]
         public partial bool IsWhoopStorLatest { get; set; }
-        private void OnInstallledSoftwareTimerElapsed(object sender, ElapsedEventArgs e)
+
+        private void CompareToInstalledSoftware()
         {
-            using (FileStream fs = File.Open(Path.Combine(Globals.AppLocalBaseUserPath, "softwarepack.json"), FileMode.Open, FileAccess.Read, FileShare.Read))
+            if (this.InstalledSoftware != null)
             {
-                this.InstalledSoftware = JsonSerializer.Deserialize<InstalledSoftware>(fs);
+                if (this.FpvSoftwareVersions != null)
+                {
+                    this.IsBluejayLatest = this.FpvSoftwareVersions.BlueJay.Equals(this.InstalledSoftware.Bluejay);
+                    this.IsBetaflightLatest = this.FpvSoftwareVersions.BetaflightFw.Equals(this.InstalledSoftware.BetaflightFw);
+                    this.IsElrsLatest = this.FpvSoftwareVersions.ExpressLRS.Equals(this.InstalledSoftware.ExpressLrs);
+                    this.IsEdgeTxLatest = this.FpvSoftwareVersions.EdgeTX.Equals(this.InstalledSoftware.EdgeTx);
+                    this.IsWhoopStorLatest = this.FpvSoftwareVersions.Whoopstor3.Equals(this.InstalledSoftware.Whoopstor);
+                }
+
+                this.IsBlenderLatest = this.Blender?.Equals(this.InstalledSoftware.Blender) ?? false;
+                this.IsGodotLatest = this.Godot?.Equals(this.InstalledSoftware.Godot) ?? false;
             }
         }
         #endregion
