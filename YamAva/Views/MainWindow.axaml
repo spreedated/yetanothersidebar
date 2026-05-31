@@ -29,6 +29,8 @@
         <ContextMenu>
           <MenuItem Header="_Open config folder" Command="{Binding OpenConfigFolderCommand}"/>
         <Separator/>
+            <MenuItem Header="Refresh _Weather" Command="{Binding RefreshWeatherCommand}"/>
+        <Separator/>
             <MenuItem Header="_Top Most" Command="{Binding ToggleTopMostCommand}">
                 <MenuItem.Icon>
                     <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding TopMostEnabled, Mode=TwoWay}"/>
@@ -118,6 +120,8 @@
                             <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Cloud, Mode=OneWay, StringFormat={}{0} %}" FontWeight="Bold" FontSize="12" />
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Right" Margin="0,0,12,0" Text="{Binding WeatherResponse.WeatherCurrent.LastUpdated, Mode=OneWay, StringFormat={}{0:dd.MM.yy HH\:mm}}" FontWeight="Bold" FontSize="10" Foreground="Gray"/>
+
+                        <li:LoadingIndicator IsVisible="{Binding IsWeatherLoading}" Height="56" Margin="0,0,0,0" Foreground="#a855f7" Mode="Wave" SpeedRatio="1.2" />
                     </StackPanel>
                 </Border>
             </StackPanel>

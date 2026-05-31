@@ -11,7 +11,7 @@ namespace YamAva.ViewLogic
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            List<WeatherApi.Forecastday> b = (List<WeatherApi.Forecastday>)value;
+            List<Forecastday> b = (List<Forecastday>)value;
             return b.FirstOrDefault()?.Day.MintempC;
         }
 

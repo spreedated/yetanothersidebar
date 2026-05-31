@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using neXn.Ui.Avalonia;
 using Services.Models;
+using Services.Workers;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -127,22 +128,22 @@ namespace YamAva.ViewModels
             {
                 this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.BlenderWorker>().LatestVersionUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<BlenderWorker>().LatestVersionUpdated += (s, v) =>
                 {
                     this.Blender = v;
                 };
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.GodotWorker>().LatestVersionUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<GodotWorker>().LatestVersionUpdated += (s, v) =>
                 {
                     this.Godot = v;
                 };
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.InstalledSoftwareWorker>().InstalledSoftwareUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<InstalledSoftwareWorker>().InstalledSoftwareUpdated += (s, v) =>
                 {
                     this.InstalledSoftware = v;
                 };
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.LgDeviceWorker>().LatestVersionsUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<LgDeviceWorker>().LatestVersionsUpdated += (s, v) =>
                 {
                     this.LogitechDevices = new ObservableCollection<LogitechDevice>(v);
 
@@ -153,12 +154,22 @@ namespace YamAva.ViewModels
                     });
                 };
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.WeatherWorker>().LatestWeatherUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<WeatherWorker>().LatestWeatherUpdated += (s, v) =>
                 {
                     this.WeatherResponse = v;
                 };
 
-                Globals.BackgroundServices.Services.GetService<Services.Workers.FpvSoftwareWorker>().LatestVersionsUpdated += (s, v) =>
+                Globals.BackgroundServices.Services.GetService<WeatherWorker>().ProcessingStarted += (s, v) =>
+                {
+                    this.IsWeatherLoading = true;
+                };
+
+                Globals.BackgroundServices.Services.GetService<WeatherWorker>().ProcessingFinished += (s, v) =>
+                {
+                    this.IsWeatherLoading = false;
+                };
+
+                Globals.BackgroundServices.Services.GetService<FpvSoftwareWorker>().LatestVersionsUpdated += (s, v) =>
                 {
                     this.FpvSoftwareVersions = v;
                 };
@@ -202,6 +213,15 @@ namespace YamAva.ViewModels
             this.Instance.Topmost = Globals.UserConfig.RuntimeConfiguration.TopMost;
             this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
             Task.Run(async () => await Globals.UserConfig.Save());
+        }
+
+        [RelayCommand]
+        private static void RefreshWeather()
+        {
+            Task.Run(async () =>
+            {
+                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
+            });
         }
 
         #region Logitech Devices
@@ -266,6 +286,8 @@ namespace YamAva.ViewModels
         #region Weather
         [ObservableProperty]
         public partial WeatherApi WeatherResponse { get; set; }
+        [ObservableProperty]
+        public partial bool IsWeatherLoading { get; set; }
         #endregion
 
         #region FpvFirmwares
