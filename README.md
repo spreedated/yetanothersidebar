@@ -12,7 +12,7 @@ Yet another Sidebar
 Yet another Sidebar is a modern, customizable sidebar application for Windows,
 designed to provide real-time monitoring of various data sources directly on your desktop.
 
-The sidebar displays up-to-date information such as weather conditions, gas station prices, hardware telemetry and more, all in a visually appealing and interactive interface.
+The sidebar displays up-to-date information such as weather conditions and all in a visually appealing and interactive interface.
 
 Built with Avalonia, it leverages a modular architecture for easy extension and integration of new data sources.
 
@@ -23,8 +23,8 @@ Built with Avalonia, it leverages a modular architecture for easy extension and 
 
 ## Technologies Used
 
-- .NET 9
-- Avalonia (for cross-platform UI)
+- .NET 10
+- Avalonia
 - CommunityToolkit.Mvvm
 - Serilog (logging)
 
