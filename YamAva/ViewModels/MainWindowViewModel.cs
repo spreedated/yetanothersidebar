@@ -215,15 +215,6 @@ namespace YamAva.ViewModels
             Task.Run(async () => await Globals.UserConfig.Save());
         }
 
-        [RelayCommand]
-        private static void RefreshWeather()
-        {
-            Task.Run(async () =>
-            {
-                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
-            });
-        }
-
         #region Logitech Devices
         [ObservableProperty]
         public partial ObservableCollection<LogitechDevice> LogitechDevices { get; set; }
@@ -281,13 +272,31 @@ namespace YamAva.ViewModels
                 }
             });
         }
+        [RelayCommand]
+        private static void RefreshLgDevices()
+        {
+            Task.Run(async () =>
+            {
+                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(LgDeviceWorker)).Process();
+            });
+        }
         #endregion
 
         #region Weather
         [ObservableProperty]
         public partial WeatherApi WeatherResponse { get; set; }
+
         [ObservableProperty]
         public partial bool IsWeatherLoading { get; set; }
+
+        [RelayCommand]
+        private static void RefreshWeather()
+        {
+            Task.Run(async () =>
+            {
+                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
+            });
+        }
         #endregion
 
         #region FpvFirmwares

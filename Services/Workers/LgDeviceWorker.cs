@@ -14,12 +14,14 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class LgDeviceWorker : BackgroundService
+    public class LgDeviceWorker : BackgroundService, IServiceWorker
     {
         private readonly ILogger<LgDeviceWorker> _logger;
         public LogitechDevice[] Devices { get; private set; }
 
         public event EventHandler<LogitechDevice[]> LatestVersionsUpdated;
+        public event EventHandler<EventArgs> ProcessingStarted;
+        public event EventHandler<EventArgs> ProcessingFinished;
 
         public LgDeviceWorker(ILogger<LgDeviceWorker> logger)
         {
@@ -30,20 +32,13 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogTrace("LgDeviceWorker is running.");
-                Stopwatch s = Stopwatch.StartNew();
-
-                this.Devices = await GetData();
-                this.LatestVersionsUpdated?.Invoke(this, this.Devices);
-
-                s.Stop();
-                _logger.LogTrace("LgDeviceWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
+                await this.Process();
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
         }
 
         [SupportedOSPlatform("windows")]
-        private static async Task<LogitechDevice[]> GetData()
+        private async Task<LogitechDevice[]> GetData()
         {
             string json = null;
             try
@@ -59,12 +54,27 @@ namespace Services.Workers
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //noop
+                _logger?.LogError(ex, "Error occurred while retrieving Logitech device data.");
+                return null;
             }
 
             return [.. JsonSerializer.Deserialize<IEnumerable<LogitechDevice>>(json)];
+        }
+
+        public async Task Process()
+        {
+            _logger.LogTrace("LgDeviceWorker is running.");
+            this.ProcessingStarted?.Invoke(this, EventArgs.Empty);
+            Stopwatch s = Stopwatch.StartNew();
+
+            this.Devices = await this.GetData();
+            this.LatestVersionsUpdated?.Invoke(this, this.Devices);
+
+            s.Stop();
+            this.ProcessingFinished?.Invoke(this, EventArgs.Empty);
+            _logger.LogTrace("LgDeviceWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
         }
     }
 }
