@@ -15,5 +15,14 @@ namespace YamAva.Models
 
         [JsonPropertyName("weatherapicom-apikey")]
         public string WeatherApiComApiKey { get; set; }
+
+        [JsonPropertyName("unifi-username")]
+        public string UniFiUsername { get; set; }
+
+        [JsonPropertyName("unifi-password")]
+        public string UniFiPassword { get; set; }
+
+        [JsonPropertyName("unifi-ssl-thumbprints")]
+        public string[] UniFiSslThumbprints { get; set; }
     }
 }

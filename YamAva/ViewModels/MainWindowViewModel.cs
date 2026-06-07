@@ -174,6 +174,11 @@ namespace YamAva.ViewModels
                     this.FpvSoftwareVersions = v;
                 };
 
+                Globals.BackgroundServices.Services.GetService<UniFiWorker>().LatestUnifiUpdated += (s, v) =>
+                {
+                    this.UnifiData = v;
+                };
+
                 // Start background services
                 Task.Run(() =>
                 {
@@ -348,6 +353,11 @@ namespace YamAva.ViewModels
                 this.IsGodotLatest = this.Godot?.Equals(this.InstalledSoftware.Godot) ?? false;
             }
         }
+        #endregion
+
+        #region Unifi
+        [ObservableProperty]
+        public partial UnifiData UnifiData { get; set; }
         #endregion
     }
 }

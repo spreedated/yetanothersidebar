@@ -17,6 +17,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Refit" Version="11.0.1" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="System.CodeDom" Version="10.0.8" />
     <PackageReference Include="System.IO.Ports" Version="10.0.8" />

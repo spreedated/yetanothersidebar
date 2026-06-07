@@ -71,6 +71,14 @@ namespace YamAva
                 {
                     return new LgDeviceWorker(new SerilogLoggerProvider().CreateLogger("lg_device"));
                 });
+                builder.Services.AddSingleton(sp =>
+                {
+                    return new UniFiWorker(new SerilogLoggerProvider().CreateLogger("unifi"), new()
+                    {
+                        Username = Globals.UserConfig.RuntimeConfiguration.UniFiUsername,
+                        Password = Globals.UserConfig.RuntimeConfiguration.UniFiPassword
+                    }, Globals.UserConfig.RuntimeConfiguration.UniFiSslThumbprints);
+                });
 
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<GodotWorker>());
@@ -78,6 +86,7 @@ namespace YamAva
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<LgDeviceWorker>());
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<WeatherWorker>());
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<FpvSoftwareWorker>());
+                builder.Services.AddHostedService(sp => sp.GetRequiredService<UniFiWorker>());
 
                 Globals.ServiceDescriptors = [.. builder.Services];
 
