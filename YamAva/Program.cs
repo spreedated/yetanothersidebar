@@ -63,10 +63,13 @@ namespace YamAva
                 });
                 builder.Services.AddSingleton<BlenderWorker>();
                 builder.Services.AddSingleton<GodotWorker>();
-                builder.Services.AddSingleton<LgDeviceWorker>();
                 builder.Services.AddSingleton(sp =>
                 {
                     return new FpvSoftwareWorker(new SerilogLoggerProvider().CreateLogger("fpv_software"));
+                });
+                builder.Services.AddSingleton(sp =>
+                {
+                    return new LgDeviceWorker(new SerilogLoggerProvider().CreateLogger("lg_device"));
                 });
 
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());

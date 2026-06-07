@@ -16,14 +16,14 @@ namespace Services.Workers
 {
     public class LgDeviceWorker : BackgroundService, IServiceWorker
     {
-        private readonly ILogger<LgDeviceWorker> _logger;
+        private readonly ILogger _logger;
         public LogitechDevice[] Devices { get; private set; }
 
         public event EventHandler<LogitechDevice[]> LatestVersionsUpdated;
         public event EventHandler<EventArgs> ProcessingStarted;
         public event EventHandler<EventArgs> ProcessingFinished;
 
-        public LgDeviceWorker(ILogger<LgDeviceWorker> logger)
+        public LgDeviceWorker(ILogger logger)
         {
             _logger = logger;
         }
@@ -32,7 +32,18 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await this.Process();
+                try
+                {
+                    await this.Process();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
+
                 await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
         }

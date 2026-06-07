@@ -40,7 +40,18 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await this.Process();
+                try
+                {
+                    await this.Process();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
+
                 await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
