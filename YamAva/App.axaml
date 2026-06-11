@@ -8,6 +8,16 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://neXn.Ui.Avalonia/LoadingIndicators.axaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Version Status Colors -->
+            <Color x:Key="VersionOldColor">#FF6B6B</Color>
+            <Color x:Key="VersionCurrentColor">#51CF66</Color>
+            <Color x:Key="VersionNewerColor">#4DABF7</Color>
+        
+            <!-- Version Status Brushes -->
+            <SolidColorBrush x:Key="VersionOldBrush" Color="{StaticResource VersionOldColor}"/>
+            <SolidColorBrush x:Key="VersionCurrentBrush" Color="{StaticResource VersionCurrentColor}"/>
+            <SolidColorBrush x:Key="VersionNewerBrush" Color="{StaticResource VersionNewerColor}"/>
         </ResourceDictionary>
     </Application.Resources>
   

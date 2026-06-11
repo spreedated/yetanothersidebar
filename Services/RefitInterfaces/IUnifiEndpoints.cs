@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Services.RefitInterfaces
 {
-    public interface IUnifiApi
+    public interface IUnifiEndpoints
     {
         [Get("/proxy/network/api/s/default/stat/health")]
         Task<ApiResponse<string>> GetHealthAsync();

@@ -76,7 +76,7 @@ namespace Services.Workers
 
             using (HttpClient client = this.CreateHttpClient())
             {
-                IUnifiApi rr = RestService.For<IUnifiApi>(client);
+                IUnifiEndpoints rr = RestService.For<IUnifiEndpoints>(client);
 
                 ApiResponse<string> loginResponse = await rr.LoginAsync(_credentials);
 
@@ -96,7 +96,7 @@ namespace Services.Workers
 
             using (HttpClient client = this.CreateHttpClient())
             {
-                IUnifiApi rr = RestService.For<IUnifiApi>(client);
+                IUnifiEndpoints rr = RestService.For<IUnifiEndpoints>(client);
 
                 ApiResponse<string> ss = await rr.GetHealthAsync();
 

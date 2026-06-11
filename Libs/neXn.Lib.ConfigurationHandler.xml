@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>neXn.Lib.ConfigurationHandler</name>
+    </assembly>
+    <members>
+        <member name="M:neXn.Lib.ConfigurationHandler.ConfigurationHandler`1.EnableAutoload">
+            <summary>
+            Enables the Autload feature
+            </summary>
+        </member>
+        <member name="M:neXn.Lib.ConfigurationHandler.ConfigurationHandler`1.DisableAutoload">
+            <summary>
+            Disables the Autload feature
+            </summary>
+        </member>
+        <member name="M:neXn.Lib.ConfigurationHandler.ConfigurationHandler`1.LoadAsync(System.Threading.CancellationToken)">
+            <summary>
+            Loads the configuration file<br/>
+            if there is no file found, a default value will be created
+            </summary>
+        </member>
+        <member name="M:neXn.Lib.ConfigurationHandler.ConfigurationHandler`1.SaveAsync(System.Threading.CancellationToken)">
+            <summary>
+            Saves the object to the config file<br/>
+            by serializing the class to a JSON object
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.Autoload">
+            <summary>
+            Determines if the config should auto refresh
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.AutoloadInterval">
+            <summary>
+            The interval for the autoload feature<br/>
+            default is one minute
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.Buffersize">
+            <summary>
+            Filestream buffersize, default is 4096
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.ConfigPath">
+            <summary>
+            The absolute path for the configuration JSON
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.CreateOnNothing">
+            <summary>
+            Determines if a config file should be created when none has been found
+            </summary>
+        </member>
+        <member name="P:neXn.Lib.ConfigurationHandler.Models.ConfigurationHandlerOptions.OverrideOnInvalid">
+            <summary>
+            Determines if a corrupted JSON should be overwritten
+            </summary>
+        </member>
+    </members>
+</doc>

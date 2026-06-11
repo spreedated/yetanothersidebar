@@ -45,8 +45,8 @@ namespace YamAva
             Globals.UserConfig = new(new(Path.Combine(Globals.AppLocalBaseUserPath, "config.json"))
             {
                 Autoload = false
-            });
-            Globals.UserConfig.Load().Wait();
+            }, new SerilogLoggerProvider().CreateLogger("UserConfig"));
+            Globals.UserConfig.LoadAsync().Wait();
             logger.LogInformation("Loaded user config");
 
             // Worker Service

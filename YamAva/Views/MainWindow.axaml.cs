@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using neXn.Ui.Avalonia;
 using Serilog;
+using System.Threading.Tasks;
 using YamAva.Logic;
 using YamAva.ViewModels;
 
@@ -39,7 +40,10 @@ namespace YamAva.Views
             _dragHandler.PointerReleased += (s, e) =>
             {
                 Globals.UserConfig.RuntimeConfiguration.LastWindowPosition = new(this.Position.X, this.Position.Y);
-                Globals.UserConfig.Save();
+                Task.Run(async () =>
+                {
+                    await Globals.UserConfig.SaveAsync();
+                });
             };
 
             _wm.RestoreWindowLocation(Globals.UserConfig.RuntimeConfiguration.LastWindowPosition);

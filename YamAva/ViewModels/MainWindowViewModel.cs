@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,10 @@ namespace YamAva.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private const string VERSION_OLD_BRUSH_KEY = "VersionOldBrush";
+        private const string VERSION_CURRENT_BRUSH_KEY = "VersionCurrentBrush";
+        private const string VERSION_NEWER_BRUSH_KEY = "VersionNewerBrush";
+
         [ObservableProperty]
         public partial string AppTitle { get; set; }
 
@@ -45,7 +51,7 @@ namespace YamAva.ViewModels
         }
 
         [ObservableProperty]
-        public partial bool IsBlenderLatest { get; set; }
+        public partial SolidColorBrush BlenderVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         [ObservableProperty]
         public partial Version Godot { get; set; }
@@ -55,7 +61,7 @@ namespace YamAva.ViewModels
         }
 
         [ObservableProperty]
-        public partial bool IsGodotLatest { get; set; }
+        public partial SolidColorBrush GodotVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         #region Ctor
         public MainWindowViewModel() : base("MainWindowViewModel")
@@ -122,6 +128,9 @@ namespace YamAva.ViewModels
 
                 this.Blender = new(1, 1, 1);
                 this.Godot = new(1, 1, 1);
+
+                this.BlenderVersionColor = GetBrush(VERSION_CURRENT_BRUSH_KEY);
+                this.GodotVersionColor = GetBrush(VERSION_NEWER_BRUSH_KEY);
             }
 
             if (!Design.IsDesignMode)
@@ -187,13 +196,44 @@ namespace YamAva.ViewModels
                         Task.Run(async () =>
                         {
                             await s.StartAsync(CancellationToken.None);
-                            _logger?.LogTrace("Started background service {ServiceName}", s.GetType().FullName);
+                            this.LogServiceStarted(s.GetType().FullName);
                         });
                     }
                 });
             }
         }
         #endregion
+
+        private static SolidColorBrush GetVersionColor(Version latest, Version installed)
+        {
+            if (latest == null || installed == null)
+            {
+                return GetBrush(VERSION_CURRENT_BRUSH_KEY);
+            }
+
+            if (latest < installed)
+            {
+                return GetBrush(VERSION_NEWER_BRUSH_KEY);
+            }
+
+            if (latest == installed)
+            {
+                return GetBrush(VERSION_CURRENT_BRUSH_KEY);
+            }
+
+            return GetBrush(VERSION_OLD_BRUSH_KEY);
+        }
+
+        private static SolidColorBrush GetBrush(string key)
+        {
+            if (Application.Current?.TryFindResource(key, out var resource) == true && resource is SolidColorBrush brush)
+            {
+                return brush;
+            }
+
+            // Fallback to a default brush if resource not found
+            return new SolidColorBrush(Colors.WhiteSmoke);
+        }
 
         [RelayCommand]
         private void CloseApplication()
@@ -217,7 +257,7 @@ namespace YamAva.ViewModels
             Globals.UserConfig.RuntimeConfiguration.TopMost ^= true;
             this.Instance.Topmost = Globals.UserConfig.RuntimeConfiguration.TopMost;
             this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
-            Task.Run(async () => await Globals.UserConfig.Save());
+            Task.Run(async () => await Globals.UserConfig.SaveAsync());
         }
 
         #region Logitech Devices
@@ -322,42 +362,50 @@ namespace YamAva.ViewModels
         }
 
         [ObservableProperty]
-        public partial bool IsBluejayLatest { get; set; }
+        public partial SolidColorBrush BluejayVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         [ObservableProperty]
-        public partial bool IsBetaflightLatest { get; set; }
+        public partial SolidColorBrush BetaflightVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         [ObservableProperty]
-        public partial bool IsElrsLatest { get; set; }
+        public partial SolidColorBrush ElrsVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         [ObservableProperty]
-        public partial bool IsEdgeTxLatest { get; set; }
+        public partial SolidColorBrush EdgeTxVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         [ObservableProperty]
-        public partial bool IsWhoopStorLatest { get; set; }
+        public partial SolidColorBrush WhoopStorVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         private void CompareToInstalledSoftware()
         {
-            if (this.InstalledSoftware != null)
+            Application.Current.Dispatcher.Post(() =>
             {
-                if (this.FpvSoftwareVersions != null)
+                if (this.InstalledSoftware != null)
                 {
-                    this.IsBluejayLatest = this.FpvSoftwareVersions.BlueJay.Equals(this.InstalledSoftware.Bluejay);
-                    this.IsBetaflightLatest = this.FpvSoftwareVersions.BetaflightFw.Equals(this.InstalledSoftware.BetaflightFw);
-                    this.IsElrsLatest = this.FpvSoftwareVersions.ExpressLRS.Equals(this.InstalledSoftware.ExpressLrs);
-                    this.IsEdgeTxLatest = this.FpvSoftwareVersions.EdgeTX.Equals(this.InstalledSoftware.EdgeTx);
-                    this.IsWhoopStorLatest = this.FpvSoftwareVersions.Whoopstor3.Equals(this.InstalledSoftware.Whoopstor);
-                }
+                    if (this.FpvSoftwareVersions != null)
+                    {
+                        this.BluejayVersionColor = GetVersionColor(this.FpvSoftwareVersions.BlueJay, this.InstalledSoftware.Bluejay);
+                        this.BetaflightVersionColor = GetVersionColor(this.FpvSoftwareVersions.BetaflightFw, this.InstalledSoftware.BetaflightFw);
+                        this.ElrsVersionColor = GetVersionColor(this.FpvSoftwareVersions.ExpressLRS, this.InstalledSoftware.ExpressLrs);
+                        this.EdgeTxVersionColor = GetVersionColor(this.FpvSoftwareVersions.EdgeTX, this.InstalledSoftware.EdgeTx);
+                        this.WhoopStorVersionColor = GetVersionColor(this.FpvSoftwareVersions.Whoopstor3, this.InstalledSoftware.Whoopstor);
+                    }
 
-                this.IsBlenderLatest = this.Blender?.Equals(this.InstalledSoftware.Blender) ?? false;
-                this.IsGodotLatest = this.Godot?.Equals(this.InstalledSoftware.Godot) ?? false;
-            }
+                    this.BlenderVersionColor = GetVersionColor(this.Blender, this.InstalledSoftware.Blender);
+                    this.GodotVersionColor = GetVersionColor(this.Godot, this.InstalledSoftware.Godot);
+                }
+            });
         }
         #endregion
 
         #region Unifi
         [ObservableProperty]
         public partial UnifiData UnifiData { get; set; }
+        #endregion
+
+        #region Logging
+        [LoggerMessage(Level = LogLevel.Trace, Message = "Started background service {ServiceName}")]
+        private partial void LogServiceStarted(string serviceName);
         #endregion
     }
 }
