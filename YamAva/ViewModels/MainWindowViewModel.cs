@@ -28,6 +28,9 @@ namespace YamAva.ViewModels
         private const string VERSION_CURRENT_BRUSH_KEY = "VersionCurrentBrush";
         private const string VERSION_NEWER_BRUSH_KEY = "VersionNewerBrush";
 
+        private readonly System.Timers.Timer _weatherLoadingSpinnerTimer;
+        private int _weatherLoadingSpinnerTicks = 5;
+
         [ObservableProperty]
         public partial string AppTitle { get; set; }
 
@@ -135,6 +138,23 @@ namespace YamAva.ViewModels
 
             if (!Design.IsDesignMode)
             {
+                _weatherLoadingSpinnerTimer = new()
+                {
+                    Interval = 1000
+                };
+
+                _weatherLoadingSpinnerTimer.Elapsed += (s, v) =>
+                {
+                    _weatherLoadingSpinnerTicks--;
+
+                    if (_weatherLoadingSpinnerTicks <= 0)
+                    {
+                        Application.Current.Dispatcher.Post(() => this.IsWeatherLoading = true);
+                        _weatherLoadingSpinnerTicks = 5;
+                        _weatherLoadingSpinnerTimer.Stop();
+                    }
+                };
+
                 this.TopMostEnabled = Globals.UserConfig.RuntimeConfiguration.TopMost;
 
                 Globals.BackgroundServices.Services.GetService<BlenderWorker>().LatestVersionUpdated += (s, v) =>
@@ -170,12 +190,20 @@ namespace YamAva.ViewModels
 
                 Globals.BackgroundServices.Services.GetService<WeatherWorker>().ProcessingStarted += (s, v) =>
                 {
-                    this.IsWeatherLoading = true;
+                    if (_weatherLoadingSpinnerTimer.Enabled)
+                    {
+                        return;
+                    }
+
+                    _weatherLoadingSpinnerTimer.Start();
                 };
 
                 Globals.BackgroundServices.Services.GetService<WeatherWorker>().ProcessingFinished += (s, v) =>
                 {
                     this.IsWeatherLoading = false;
+
+                    _weatherLoadingSpinnerTimer.Stop();
+                    _weatherLoadingSpinnerTicks = 5;
                 };
 
                 Globals.BackgroundServices.Services.GetService<FpvSoftwareWorker>().LatestVersionsUpdated += (s, v) =>
