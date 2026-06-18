@@ -239,12 +239,15 @@ namespace YamAva.ViewModels
                 return GetBrush(VERSION_CURRENT_BRUSH_KEY);
             }
 
-            if (latest < installed)
+            Version l = new(latest.Major, Math.Max(latest.Minor, 0), Math.Max(latest.Build,0), Math.Max(latest.Revision, 0));
+            Version i = new(installed.Major, Math.Max(installed.Minor, 0), Math.Max(installed.Build,0), Math.Max(installed.Revision, 0));
+
+            if (l < i)
             {
                 return GetBrush(VERSION_NEWER_BRUSH_KEY);
             }
 
-            if (latest == installed)
+            if (l == i)
             {
                 return GetBrush(VERSION_CURRENT_BRUSH_KEY);
             }
