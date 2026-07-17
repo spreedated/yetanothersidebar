@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Services.Models;
 using System;
 using System.IO;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class InstalledSoftwareWorker : BackgroundService
+    public class InstalledSoftwareWorker : ServiceWorker
     {
         private const string SOFTAREPACK_FILENNAME = "softwarepack.json";
         private readonly FileSystemWatcher _watcher;
@@ -38,7 +37,7 @@ namespace Services.Workers
                     return;
                 }
 
-                await this.UpdateInstalledSoftware();
+                await this.Process();
             };
         }
         #endregion
@@ -47,7 +46,28 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await this.UpdateInstalledSoftware();
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("InstalledSoftwareWorker is disabled. Skipping processing.");
+                    return;
+                }
+
+                try
+                {
+                    base.RaiseProcessedStarted();
+
+                    await this.Process();
+
+                    base.RaiseProcessedFinished();
+                    this.InstalledSoftwareUpdated?.Invoke(this, this.InstalledSoftware);
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
 
                 await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
@@ -59,7 +79,7 @@ namespace Services.Workers
             await base.StopAsync(cancellationToken);
         }
 
-        private async Task UpdateInstalledSoftware()
+        public override async Task Process()
         {
             if (!File.Exists(Path.Combine(_configPath, SOFTAREPACK_FILENNAME)))
             {
@@ -71,7 +91,6 @@ namespace Services.Workers
                 this.InstalledSoftware = await JsonSerializer.DeserializeAsync<InstalledSoftware>(fs);
             }
 
-            this.InstalledSoftwareUpdated?.Invoke(this, this.InstalledSoftware);
             _logger?.LogTrace("Installed software updated.");
         }
     }

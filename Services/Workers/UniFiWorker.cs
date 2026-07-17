@@ -1,7 +1,6 @@
 ﻿#pragma warning disable S4830 // S4830: Don't use HttpClient with an insecure SSL/TLS configuration
 #pragma warning disable S1075 // S1075: URIs should not be hardcoded
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Refit;
 using Services.Models;
@@ -17,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class UniFiWorker : BackgroundService, IServiceWorker
+    public class UniFiWorker : ServiceWorker
     {
         private readonly ILogger _logger;
         private readonly string[] _validSslThumbprints;
@@ -25,8 +24,6 @@ namespace Services.Workers
         private CookieContainer _cookieContainer;
 
         public event EventHandler<UnifiData> LatestUnifiUpdated;
-        public event EventHandler<EventArgs> ProcessingStarted;
-        public event EventHandler<EventArgs> ProcessingFinished;
 
         public UnifiData LatestUnifiData { get; private set; }
 
@@ -80,6 +77,11 @@ namespace Services.Workers
 
                 ApiResponse<string> loginResponse = await rr.LoginAsync(_credentials);
 
+                if (loginResponse.Error != null)
+                {
+                    throw new EntryPointNotFoundException("Service Unavailable");
+                }
+
                 if (loginResponse.StatusCode != HttpStatusCode.OK)
                 {
                     throw new UnauthorizedAccessException("Invalid credentials");
@@ -87,7 +89,7 @@ namespace Services.Workers
             }
         }
 
-        public async Task Process()
+        public override async Task Process()
         {
             if (_cookieContainer == null || _cookieContainer.Count <= 0)
             {
@@ -99,6 +101,11 @@ namespace Services.Workers
                 IUnifiEndpoints rr = RestService.For<IUnifiEndpoints>(client);
 
                 ApiResponse<string> ss = await rr.GetHealthAsync();
+
+                if (ss.Error != null)
+                {
+                    throw new EntryPointNotFoundException("Service Unavailable");
+                }
 
                 if (ss.StatusCode == HttpStatusCode.Unauthorized)
                 {
@@ -149,13 +156,19 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("UniFiWorker is disabled. Skipping processing.");
+                    return;
+                }
+
                 try
                 {
-                    this.ProcessingStarted?.Invoke(this, EventArgs.Empty);
+                    base.RaiseProcessedStarted();
 
                     await this.Process();
 
-                    this.ProcessingFinished?.Invoke(this, EventArgs.Empty);
+                    base.RaiseProcessedFinished();
                     this.LatestUnifiUpdated?.Invoke(this, this.LatestUnifiData);
                 }
                 catch (Exception ex)

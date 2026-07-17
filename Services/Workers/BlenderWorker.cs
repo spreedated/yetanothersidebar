@@ -1,16 +1,16 @@
 ﻿using HtmlAgilityPack;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using neXn.Lib.Strings;
+using neXn.Lib;
 
 namespace Services.Workers
 {
-    public class BlenderWorker : BackgroundService
+    public class BlenderWorker : ServiceWorker
     {
         private readonly ILogger<BlenderWorker> _logger;
 
@@ -27,17 +27,37 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogTrace("BlenderWorker is running.");
-                Stopwatch s = Stopwatch.StartNew();
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("BlenderWorker is disabled. Skipping processing.");
+                    return;
+                }
 
-                HtmlDocument doc = await this.DownloadSourcecode();
-                this.LatestVersion = this.ParseSourcecode(doc);
-                this.LatestVersionUpdated?.Invoke(this, this.LatestVersion);
+                try
+                {
+                    base.RaiseProcessedStarted();
 
-                s.Stop();
-                _logger.LogTrace("BlenderWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
+                    await this.Process();
+
+                    base.RaiseProcessedFinished();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
+
                 await Task.Delay(TimeSpan.FromHours(4), stoppingToken);
             }
+        }
+
+        public override async Task Process()
+        {
+            HtmlDocument doc = await this.DownloadSourcecode();
+            this.LatestVersion = this.ParseSourcecode(doc);
+            this.LatestVersionUpdated?.Invoke(this, this.LatestVersion);
         }
 
         private async Task<HtmlDocument> DownloadSourcecode()
@@ -85,7 +105,7 @@ namespace Services.Workers
                 return default;
             }
 
-            if (Version.TryParse(node.InnerHtml.Replace("v", ""), out Version v))
+            if (Version.TryParse(node.InnerHtml.AllowOnlyCharacters("0123456789."), out Version v))
             {
                 return v;
             }

@@ -12,5 +12,8 @@ namespace Services.Models
 
         [JsonPropertyName("forecast")]
         public Forecast WeatherForecast { get; set; }
+
+        [JsonIgnore]
+        public bool Error { get; init; }
     }
 }

@@ -24,74 +24,130 @@
     <Application.Styles>
         <FluentTheme />
 
-      <Style Selector="Window">
-        <Setter Property="WindowStartupLocation" Value="Manual"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Opacity" Value="0.8"/>
-        <Setter Property="ShowInTaskbar" Value="False"/>
-        <Setter Property="Width" Value="220"/>
-        <Setter Property="WindowDecorations" Value="None"/>
-      </Style>
+        <Style Selector="Border.card">
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="2"/>
+            <Setter Property="Background" Value="#1c1c1e"/>
+            <Setter Property="BorderBrush">
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="#06b6d4" Offset="0"/>
+                    <GradientStop Color="#3b82f6" Offset="0.25"/>
+                    <GradientStop Color="#8b5cf6" Offset="0.5"/>
+                    <GradientStop Color="#a855f7" Offset="0.75"/>
+                    <GradientStop Color="#ec4899" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter>
+            <Setter Property="Effect">
+                <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
+            </Setter>
+        </Style>
+        
+        <Style Selector="Border.card-header">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Background" Value="#2a2a2d"/>
+            <Setter Property="Margin" Value="4,4,4,8"/>
+        </Style>
 
-      <Style Selector="Button">
-        <Setter Property="Foreground" Value="WhiteSmoke"/>
-      </Style>
-      
-      <Style Selector="Label">
-        <Setter Property="Foreground" Value="WhiteSmoke"/>
-      </Style>
+        <Style Selector="Label.card-header-label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+            <Setter Property="Foreground" Value="#777777"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
 
-      <Style Selector="TextBlock">
-        <Setter Property="Foreground" Value="WhiteSmoke"/>
-      </Style>
+        <Style Selector="Window">
+          <Setter Property="WindowStartupLocation" Value="Manual"/>
+          <Setter Property="Background" Value="Transparent"/>
+          <Setter Property="Opacity" Value="0.8"/>
+          <Setter Property="ShowInTaskbar" Value="False"/>
+          <Setter Property="Width" Value="220"/>
+          <Setter Property="WindowDecorations" Value="None"/>
+        </Style>
 
-      <Style Selector="Border#BorderWindow">
-        <Setter Property="Background" Value="#222222"/>
-        <Setter Property="CornerRadius" Value="16"/>
-        <Setter Property="Padding" Value="8"/>
-      </Style>
+        <Style Selector="Button">
+          <Setter Property="Foreground" Value="WhiteSmoke"/>
+        </Style>
 
-      <Style Selector="HeaderedContentControl">
-        <Setter Property="Template">
-          <ControlTemplate>
-            <Grid>
-              <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-              </Grid.RowDefinitions>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-              </Grid.ColumnDefinitions>
+        <Style Selector="Button.transparent-icon">
+              <Setter Property="Background" Value="Transparent"/>
+              <Setter Property="BorderThickness" Value="0"/>
+              <Setter Property="Padding" Value="6"/>
+              <Setter Property="Cursor" Value="Hand"/>
 
-              <!-- Header -->
-              <Border
-                  ZIndex="1"
-                  Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                  Padding="5,0,5,0"
-                  Margin="5,0,0,0">
-                <TextBlock
-                    Text="{TemplateBinding Header}"
-                    FontWeight="Bold"/>
-              </Border>
+              <!-- Hover state -->
+              <Style Selector="^:pointerover">
+                  <Setter Property="Background" Value="Transparent"/>
+              </Style>
 
-              <!-- Content Area -->
-              <Border
-                  Grid.RowSpan="2"
-                  Padding="0,5,0,0"
-                  Grid.ColumnSpan="2"
-                  CornerRadius="4"
-                  Margin="0,10,0,0"
-                  BorderBrush="WhiteSmoke"
-                  BorderThickness="1">
-                <ContentPresenter
-                    Name="PART_ContentPresenter"
-                    Padding="8"
-                    Content="{TemplateBinding Content}"/>
-              </Border>
-            </Grid>
-          </ControlTemplate>
-        </Setter>
-      </Style>
+              <!-- Pressed state -->
+              <Style Selector="^:pressed">
+                  <Setter Property="Background" Value="Transparent"/>
+              </Style>
+
+             <!-- Disabled state -->
+             <Style Selector="^:disabled">
+                 <Setter Property="Opacity" Value="0.4"/>
+             </Style>
+         </Style>
+
+        <Style Selector="Label">
+          <Setter Property="Foreground" Value="WhiteSmoke"/>
+        </Style>
+
+        <Style Selector="TextBlock">
+          <Setter Property="Foreground" Value="WhiteSmoke"/>
+        </Style>
+
+        <Style Selector="Border#BorderWindow">
+          <Setter Property="Background" Value="#222222"/>
+          <Setter Property="CornerRadius" Value="16"/>
+          <Setter Property="Padding" Value="8"/>
+        </Style>
+
+        <Style Selector="HeaderedContentControl">
+          <Setter Property="Template">
+            <ControlTemplate>
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto"/>
+                  <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+     
+                <!-- Header -->
+                <Border
+                    ZIndex="1"
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    Padding="5,0,5,0"
+                    Margin="5,0,0,0">
+                  <TextBlock
+                      Text="{TemplateBinding Header}"
+                      FontWeight="Bold"/>
+                </Border>
+     
+                <!-- Content Area -->
+                <Border
+                    Grid.RowSpan="2"
+                    Padding="0,5,0,0"
+                    Grid.ColumnSpan="2"
+                    CornerRadius="4"
+                    Margin="0,10,0,0"
+                    BorderBrush="WhiteSmoke"
+                    BorderThickness="1">
+                  <ContentPresenter
+                      Name="PART_ContentPresenter"
+                      Padding="8"
+                      Content="{TemplateBinding Content}"/>
+                </Border>
+              </Grid>
+            </ControlTemplate>
+          </Setter>
+        </Style>
     </Application.Styles>
 </Application>

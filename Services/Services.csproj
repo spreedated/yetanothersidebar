@@ -37,6 +37,9 @@
     <Reference Include="SimpleMem">
       <HintPath>..\Libs\SimpleMem.dll</HintPath>
     </Reference>
+  <Reference Include="neXn.Lib">
+      <HintPath>..\Libs\neXn.Lib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

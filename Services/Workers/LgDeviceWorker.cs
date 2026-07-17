@@ -1,6 +1,5 @@
 ﻿#pragma warning disable CA1416 // Suppress "Platform compatibility" warning since this code is intended to run on Windows and uses Windows-specific APIs
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Services.Models;
 using System;
@@ -14,14 +13,12 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class LgDeviceWorker : BackgroundService, IServiceWorker
+    public class LgDeviceWorker : ServiceWorker
     {
         private readonly ILogger _logger;
         public LogitechDevice[] Devices { get; private set; }
 
         public event EventHandler<LogitechDevice[]> LatestVersionsUpdated;
-        public event EventHandler<EventArgs> ProcessingStarted;
-        public event EventHandler<EventArgs> ProcessingFinished;
 
         public LgDeviceWorker(ILogger logger)
         {
@@ -32,6 +29,12 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("LgDeviceWorker is disabled. Skipping processing.");
+                    return;
+                }
+
                 try
                 {
                     await this.Process();
@@ -74,17 +77,17 @@ namespace Services.Workers
             return [.. JsonSerializer.Deserialize<IEnumerable<LogitechDevice>>(json)];
         }
 
-        public async Task Process()
+        public override async Task Process()
         {
             _logger.LogTrace("LgDeviceWorker is running.");
-            this.ProcessingStarted?.Invoke(this, EventArgs.Empty);
+            base.RaiseProcessedStarted();
             Stopwatch s = Stopwatch.StartNew();
 
             this.Devices = await this.GetData();
             this.LatestVersionsUpdated?.Invoke(this, this.Devices);
 
             s.Stop();
-            this.ProcessingFinished?.Invoke(this, EventArgs.Empty);
+            base.RaiseProcessedFinished();
             _logger.LogTrace("LgDeviceWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
         }
     }

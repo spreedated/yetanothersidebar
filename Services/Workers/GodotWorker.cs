@@ -1,10 +1,9 @@
 ﻿#pragma warning disable S1075 // Suppress "URIs should not be hardcoded" warning since this is a well-known API endpoint that is unlikely to change
 
 using HtmlAgilityPack;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using neXn.Lib;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -12,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class GodotWorker : BackgroundService
+    public class GodotWorker : ServiceWorker
     {
         private readonly ILogger<GodotWorker> _logger;
 
@@ -29,17 +28,37 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogTrace("GodotWorker is running.");
-                Stopwatch s = Stopwatch.StartNew();
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("GodotWorker is disabled. Skipping processing.");
+                    return;
+                }
 
-                HtmlDocument doc = await this.DownloadSourcecode();
-                this.LatestVersion = ParseSourcecode(doc);
-                this.LatestVersionUpdated?.Invoke(this, this.LatestVersion);
+                try
+                {
+                    base.RaiseProcessedStarted();
 
-                s.Stop();
-                _logger.LogTrace("GodotWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
+                    await this.Process();
+
+                    base.RaiseProcessedFinished();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
+
                 await Task.Delay(TimeSpan.FromHours(4), stoppingToken);
             }
+        }
+
+        public override async Task Process()
+        {
+            HtmlDocument doc = await this.DownloadSourcecode();
+            this.LatestVersion = ParseSourcecode(doc);
+            this.LatestVersionUpdated?.Invoke(this, this.LatestVersion);
         }
 
         private async Task<HtmlDocument> DownloadSourcecode()
@@ -89,7 +108,7 @@ namespace Services.Workers
                 return default;
             }
 
-            if (Version.TryParse(node.InnerHtml, out Version v))
+            if (Version.TryParse(node.InnerHtml.AllowOnlyCharacters("0123456789."), out Version v))
             {
                 return v;
             }

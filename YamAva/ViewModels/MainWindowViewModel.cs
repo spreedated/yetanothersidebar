@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentIcons.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,26 +46,6 @@ namespace YamAva.ViewModels
 
         [ObservableProperty]
         public partial bool TopMostEnabled { get; set; }
-
-        [ObservableProperty]
-        public partial Version Blender { get; set; }
-        partial void OnBlenderChanged(Version value)
-        {
-            this.CompareToInstalledSoftware();
-        }
-
-        [ObservableProperty]
-        public partial SolidColorBrush BlenderVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
-
-        [ObservableProperty]
-        public partial Version Godot { get; set; }
-        partial void OnGodotChanged(Version value)
-        {
-            this.CompareToInstalledSoftware();
-        }
-
-        [ObservableProperty]
-        public partial SolidColorBrush GodotVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
 
         #region Ctor
         public MainWindowViewModel() : base("MainWindowViewModel")
@@ -213,6 +194,21 @@ namespace YamAva.ViewModels
 
                 Globals.BackgroundServices.Services.GetService<UniFiWorker>().LatestUnifiUpdated += (s, v) =>
                 {
+                    if (v.Error)
+                    {
+                        this.UnifiData = new()
+                        {
+                            ClientsConnected = -1,
+                            CpuUsage = -1,
+                            DownloadBps = -1,
+                            LastUpdated = DateTime.Now,
+                            MemoryUsage = -1,
+                            UploadBps = -1,
+                            Uptime = "---"
+                        };
+                        return;
+                    }
+
                     this.UnifiData = v;
                 };
 
@@ -291,6 +287,28 @@ namespace YamAva.ViewModels
             Task.Run(async () => await Globals.UserConfig.SaveAsync());
         }
 
+        #region Software Versions
+        [ObservableProperty]
+        public partial Version Blender { get; set; }
+        partial void OnBlenderChanged(Version value)
+        {
+            this.CompareToInstalledSoftware();
+        }
+
+        [ObservableProperty]
+        public partial SolidColorBrush BlenderVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
+
+        [ObservableProperty]
+        public partial Version Godot { get; set; }
+        partial void OnGodotChanged(Version value)
+        {
+            this.CompareToInstalledSoftware();
+        }
+
+        [ObservableProperty]
+        public partial SolidColorBrush GodotVersionColor { get; set; } = new SolidColorBrush(Colors.WhiteSmoke);
+        #endregion
+
         #region Logitech Devices
         [ObservableProperty]
         public partial ObservableCollection<LogitechDevice> LogitechDevices { get; set; }
@@ -353,12 +371,15 @@ namespace YamAva.ViewModels
         {
             Task.Run(async () =>
             {
-                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(LgDeviceWorker)).Process();
+                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<ServiceWorker>().First(x => x.GetType() == typeof(LgDeviceWorker)).Process();
             });
         }
         #endregion
 
         #region Weather
+        [ObservableProperty]
+        public partial bool IsWeatherServiceEnabled { get; set; } = true;
+
         [ObservableProperty]
         public partial WeatherApi WeatherResponse { get; set; }
 
@@ -370,12 +391,15 @@ namespace YamAva.ViewModels
         {
             Task.Run(async () =>
             {
-                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<IServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
+                await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<ServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
             });
         }
         #endregion
 
         #region FpvFirmwares
+        [ObservableProperty]
+        public partial bool IsFpvServiceEnabled { get; set; } = true;
+
         [ObservableProperty]
         public partial FpvSoftwareVersions FpvSoftwareVersions { get; set; }
         partial void OnFpvSoftwareVersionsChanged(FpvSoftwareVersions value)
@@ -385,6 +409,9 @@ namespace YamAva.ViewModels
         #endregion
 
         #region Installed Software List
+        [ObservableProperty]
+        public partial bool IsInstalledSoftwareListEnabled { get; set; } = true;
+
         [ObservableProperty]
         public partial InstalledSoftware InstalledSoftware { get; set; }
         partial void OnInstalledSoftwareChanged(InstalledSoftware value)
@@ -431,7 +458,33 @@ namespace YamAva.ViewModels
 
         #region Unifi
         [ObservableProperty]
+        public partial bool IsUnifiServiceEnabled { get; set; } = true;
+
+        [ObservableProperty]
         public partial UnifiData UnifiData { get; set; }
+        #endregion
+
+        #region Connection Icon
+        private bool _areWorkersRunning = true;
+
+        [ObservableProperty]
+        public partial Symbol ConnectionIcon { get; set; } = Symbol.PlugConnected;
+
+        [ObservableProperty]
+        public partial SolidColorBrush ConnectionIconColor { get; set; } = new SolidColorBrush(Colors.Green);
+
+        [RelayCommand]
+        private void ToggleWorkers()
+        {
+            _areWorkersRunning ^= true;
+            this.ConnectionIcon = _areWorkersRunning ? Symbol.PlugConnected : Symbol.PlugDisconnected;
+            this.ConnectionIconColor = new SolidColorBrush(_areWorkersRunning ? Colors.Green : Colors.Red);
+
+            foreach (var service in Globals.BackgroundServices.Services.GetServices<ServiceWorker>().Where(x => nameof(x) != "LgDeviceWorker"))
+            {
+                service.ToggleService();
+            }
+        }
         #endregion
 
         #region Logging

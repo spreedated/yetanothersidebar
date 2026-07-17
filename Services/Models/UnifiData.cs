@@ -42,5 +42,6 @@ namespace Services.Models
         public float CpuUsage { get; init; }
 
         public DateTime LastUpdated { get; init; }
+        public bool Error { get; init; }
     }
 }

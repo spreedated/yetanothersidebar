@@ -1,6 +1,5 @@
 ﻿#pragma warning disable S1075 // Suppress "URIs should not be hardcoded" warning since the Weather API base URL is unlikely to change and is more readable as a constant
 
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Refit;
 using Services.Converters;
@@ -9,14 +8,13 @@ using Services.RefitInterfaces;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class WeatherWorker : BackgroundService, IServiceWorker
+    public class WeatherWorker : ServiceWorker
     {
         private readonly ILogger _logger;
         private readonly string _weatherApiKey;
@@ -27,8 +25,8 @@ namespace Services.Workers
         {
             PropertyNameCaseInsensitive = true,
             NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
-            Converters = 
-            { 
+            Converters =
+            {
                 new WeatherApiDateTimeConverter(),
                 new IntToBoolConverter()
             }
@@ -37,8 +35,6 @@ namespace Services.Workers
         public WeatherApi LatestWeather { get; private set; }
 
         public event EventHandler<WeatherApi> LatestWeatherUpdated;
-        public event EventHandler<EventArgs> ProcessingStarted;
-        public event EventHandler<EventArgs> ProcessingFinished;
 
         #region Ctor
         public WeatherWorker(ILogger logger, string weatherApiKey)
@@ -57,6 +53,12 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("WeatherWorker is disabled. Skipping processing.");
+                    return;
+                }
+
                 try
                 {
                     await this.Process();
@@ -64,7 +66,7 @@ namespace Services.Workers
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Process error");
-                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
 
                     continue;
                 }
@@ -73,10 +75,10 @@ namespace Services.Workers
             }
         }
 
-        public async Task Process()
+        public override async Task Process()
         {
             _logger?.LogTrace("WeatherWorker is running.");
-            this.ProcessingStarted?.Invoke(this, EventArgs.Empty);
+            base.RaiseProcessedStarted();
 
             Stopwatch s = Stopwatch.StartNew();
 
@@ -85,7 +87,7 @@ namespace Services.Workers
 
             s.Stop();
 
-            this.ProcessingFinished?.Invoke(this, EventArgs.Empty);
+            base.RaiseProcessedFinished();
             _logger?.LogTrace("WeatherWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
         }
 

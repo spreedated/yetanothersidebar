@@ -2,11 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:YamAva.ViewModels"
         xmlns:vl="using:YamAva.ViewLogic"
+        xmlns:nconv="using:neXn.Ui.Avalonia.Converter"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ve="using:YamAva.ViewElements"
         xmlns:li="using:neXn.Ui.Avalonia"
         xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+        xmlns:ui="using:FluentIcons.Avalonia"
         mc:Ignorable="d"
         x:Class="YamAva.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -25,321 +27,241 @@
     <vm:MainWindowViewModel/>
   </Design.DataContext>
 
-    <Window.ContextMenu>
-        <ContextMenu>
-          <MenuItem Header="_Open config folder" Command="{Binding OpenConfigFolderCommand}"/>
-        <Separator/>
-            <MenuItem Header="Refresh _Weather" Command="{Binding RefreshWeatherCommand}"/>
-            <MenuItem Header="Refresh _LG Devices" Command="{Binding RefreshLgDevicesCommand}"/>
-        <Separator/>
-            <MenuItem Header="_Top Most" Command="{Binding ToggleTopMostCommand}">
-                <MenuItem.Icon>
-                    <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding TopMostEnabled, Mode=TwoWay}"/>
-                </MenuItem.Icon>
-            </MenuItem>
-        <Separator/>
-          <MenuItem Header="E_xit" Command="{Binding CloseApplicationCommand}"/>
-        </ContextMenu>
+  <Window.ContextMenu>
+    <ContextMenu>
+        <MenuItem Header="_Open config folder" Command="{Binding OpenConfigFolderCommand}"/>
+    <Separator/>
+        <MenuItem Header="Refresh _Weather" Command="{Binding RefreshWeatherCommand}"/>
+        <MenuItem Header="Refresh _LG Devices" Command="{Binding RefreshLgDevicesCommand}"/>
+    <Separator/>
+        <MenuItem Header="_Top Most" Command="{Binding ToggleTopMostCommand}">
+            <MenuItem.Icon>
+                <CheckBox BorderThickness="0" IsHitTestVisible="True" IsChecked="{Binding TopMostEnabled, Mode=TwoWay}"/>
+            </MenuItem.Icon>
+        </MenuItem>
+    <Separator/>
+        <MenuItem Header="E_xit" Command="{Binding CloseApplicationCommand}"/>
+    </ContextMenu>
   </Window.ContextMenu>
 
   <Border x:Name="BorderWindow">
       <StackPanel Orientation="Vertical">
+          <!-- Icons -->
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+              <Button Classes="transparent-icon" Command="{Binding ToggleWorkersCommand}">
+                <Grid>
+                    <ui:SymbolIcon Symbol="{Binding ConnectionIcon}" Foreground="{Binding ConnectionIconColor}" />
+                </Grid>
+              </Button>
+          </StackPanel>
+          <!-- # ### # -->
+
           <!-- Weather -->
-            <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
-                <Border CornerRadius="15" 
-                        BorderThickness="2" 
-                        Padding="2"
-                        Background="#1c1c1e">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                            <GradientStop Color="#06b6d4" Offset="0"/>
-                            <GradientStop Color="#3b82f6" Offset="0.25"/>
-                            <GradientStop Color="#8b5cf6" Offset="0.5"/>
-                            <GradientStop Color="#a855f7" Offset="0.75"/>
-                            <GradientStop Color="#ec4899" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <Border.Effect>
-                        <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
-                    </Border.Effect>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0">
-                        <Border Background="#2a2a2d" CornerRadius="12" Padding="12,8" Margin="4,4,4,8">
-                            <Label Content="Weather" 
-                                   FontSize="11" 
-                                   FontWeight="Bold"
-                                   Foreground="#777"
-                                   LetterSpacing="1"
-                                   HorizontalAlignment="Center"/>
-                        </Border>
+        <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
+            <Border Classes="card">
+                <StackPanel Orientation="Vertical" Margin="0">
+                    <Border Classes="card-header">
+                        <Grid>
+                            <Label Classes="card-header-label" Content="Weather"/>
+                            <ui:SymbolIcon Symbol="FlowDot" Foreground="Orange" IsVisible="{Binding IsWeatherServiceEnabled, Converter={nconv:ReverseBoolConverter}}" HorizontalAlignment="Left"/>
+                            <!-- TODO: implement loading indicator -->
+                            <!--<ui:SymbolIcon Symbol="ArrowSync" Foreground="{Binding ConnectionIconColor}" HorizontalAlignment="Right"/>-->
+                        </Grid>
+                    </Border>
 
-                        <StackPanel Orientation="Vertical">
-                            <Image asyncImageLoader:ImageLoader.Source="{Binding WeatherResponse.WeatherCurrent.Condition.IconAdress}" MaxHeight="64" Margin="-10" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Condition.Text, Mode=OneWay}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="-5" />
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="12,0,0,0">
-                            <Label Content="Temp:" FontWeight="Bold" FontSize="12"/>
-                            <Grid Margin="12,0,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <StackPanel Orientation="Horizontal" Grid.Row="0">
-                                    <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.TempC, Mode=OneWay, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
-                                    <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.FeelslikeC, Mode=OneWay, StringFormat={} ({0} °C)}" FontWeight="Bold" FontSize="12" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Row="1">
-                                    <TextBlock Text="Highest:" FontWeight="Bold" FontSize="12" />
-                                    <TextBlock Text="{Binding WeatherResponse.WeatherForecast.Forecastday, Mode=OneWay, Converter={vl:WeatherToHighestTemp}, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Grid.Row="2">
-                                    <TextBlock Text="Lowest:" FontWeight="Bold" FontSize="12" />
-                                    <TextBlock Text="{Binding WeatherResponse.WeatherForecast.Forecastday, Mode=OneWay, Converter={vl:WeatherToLowestTemp}, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                            <TextBlock Text="Humidity:" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Humidity, Mode=OneWay, StringFormat={}{0} %}" FontWeight="Bold" FontSize="12" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                            <TextBlock Text="UV:" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Uv, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                            <TextBlock Text="Wind:" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.WindKph, Mode=OneWay, StringFormat={}{0} km/h}" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.WindDir, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                            <TextBlock Text="Air Quality:" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.AirQuality.UsEpaDescription, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
-                            <TextBlock Text="Clouds:" FontWeight="Bold" FontSize="12" />
-                            <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Cloud, Mode=OneWay, StringFormat={}{0} %}" FontWeight="Bold" FontSize="12" />
-                        </StackPanel>
-                        <TextBlock HorizontalAlignment="Right" Margin="0,0,12,0" Text="{Binding WeatherResponse.WeatherCurrent.LastUpdated, Mode=OneWay, StringFormat={}{0:dd.MM.yy HH\:mm}}" FontWeight="Bold" FontSize="10" Foreground="Gray"/>
-
-                        <li:LoadingIndicator IsVisible="{Binding IsWeatherLoading}" Height="56" Margin="0,0,0,0" Foreground="#a855f7" Mode="Wave" SpeedRatio="1.2" />
+                    <StackPanel Orientation="Vertical">
+                        <Image asyncImageLoader:ImageLoader.Source="{Binding WeatherResponse.WeatherCurrent.Condition.IconAdress}" MaxHeight="64" Margin="-10" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Condition.Text, Mode=OneWay}" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" Margin="-5" />
                     </StackPanel>
-                </Border>
-            </StackPanel>
-            <!-- # ### # -->
-
-            <!-- FPV Firmwares -->
-            <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
-                <Border CornerRadius="15" 
-                        BorderThickness="2" 
-                        Padding="2"
-                        Background="#1c1c1e">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                            <GradientStop Color="#06b6d4" Offset="0"/>
-                            <GradientStop Color="#3b82f6" Offset="0.25"/>
-                            <GradientStop Color="#8b5cf6" Offset="0.5"/>
-                            <GradientStop Color="#a855f7" Offset="0.75"/>
-                            <GradientStop Color="#ec4899" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <Border.Effect>
-                        <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
-                    </Border.Effect>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0">
-                        <Border Background="#2a2a2d" CornerRadius="12" Padding="12,8" Margin="4,4,4,8">
-                            <Label Content="FPV Firmwares" 
-                                   FontSize="11" 
-                                   FontWeight="Bold"
-                                   Foreground="#777"
-                                   LetterSpacing="1"
-                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                        <StackPanel Orientation="Vertical" Margin="8,0,8,8">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="BlueJay:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BluejayVersionColor}" Text="{Binding FpvSoftwareVersions.BlueJay}" FontWeight="Bold"/>
+                    <StackPanel Orientation="Vertical" Margin="12,0,0,0">
+                        <Label Content="Temp:" FontWeight="Bold" FontSize="12"/>
+                        <Grid Margin="12,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                                <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.TempC, Mode=OneWay, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
+                                <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.FeelslikeC, Mode=OneWay, StringFormat={} ({0} °C)}" FontWeight="Bold" FontSize="12" />
                             </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="12" Text="Betaflight FW:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BetaflightVersionColor}" Text="{Binding FpvSoftwareVersions.BetaflightFw}" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                                <TextBlock Text="Highest:" FontWeight="Bold" FontSize="12" />
+                                <TextBlock Text="{Binding WeatherResponse.WeatherForecast.Forecastday, Mode=OneWay, Converter={vl:WeatherToHighestTemp}, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
                             </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="12" Text="ExpressLRS:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding ElrsVersionColor}" Text="{Binding FpvSoftwareVersions.ExpressLRS}" FontWeight="Bold"/>
+                            <StackPanel Orientation="Horizontal" Grid.Row="2">
+                                <TextBlock Text="Lowest:" FontWeight="Bold" FontSize="12" />
+                                <TextBlock Text="{Binding WeatherResponse.WeatherForecast.Forecastday, Mode=OneWay, Converter={vl:WeatherToLowestTemp}, StringFormat={}{0} °C}" FontWeight="Bold" FontSize="12" />
                             </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
+                        <TextBlock Text="Humidity:" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Humidity, Mode=OneWay, StringFormat={}{0} %}" FontWeight="Bold" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
+                        <TextBlock Text="UV:" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Uv, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
+                        <TextBlock Text="Wind:" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.WindKph, Mode=OneWay, StringFormat={}{0} km/h}" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.WindDir, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
+                        <TextBlock Text="Air Quality:" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.AirQuality.UsEpaDescription, Mode=OneWay}" FontWeight="Bold" FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="12,0,0,0">
+                        <TextBlock Text="Clouds:" FontWeight="Bold" FontSize="12" />
+                        <TextBlock Text="{Binding WeatherResponse.WeatherCurrent.Cloud, Mode=OneWay, StringFormat={}{0} %}" FontWeight="Bold" FontSize="12" />
+                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Right" Margin="0,0,12,0" Text="{Binding WeatherResponse.WeatherCurrent.LastUpdated, Mode=OneWay, StringFormat={}{0:dd.MM.yy HH\:mm}}" FontWeight="Bold" FontSize="10" Foreground="Gray"/>
 
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="12" Text="EdgeTX:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding EdgeTxVersionColor}" Text="{Binding FpvSoftwareVersions.EdgeTX}" FontWeight="Bold"/>
-                            </StackPanel>
+                    <li:LoadingIndicator IsVisible="{Binding IsWeatherLoading}" Height="56" Margin="0,0,0,0" Foreground="#a855f7" Mode="Wave" SpeedRatio="1.2" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+        <!-- # ### # -->
 
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock FontSize="12" Text="WhoopStor V3:"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding WhoopStorVersionColor}" Text="{Binding FpvSoftwareVersions.Whoopstor3}" FontWeight="Bold"/>
-                            </StackPanel>
+        <!-- FPV Firmwares -->
+        <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
+            <Border Classes="card">
+                <StackPanel Orientation="Vertical" Margin="0">
+                    <Border Classes="card-header">
+                        <Grid>
+                            <Label Classes="card-header-label" Content="FPV Firmwares"/>
+                            <ui:SymbolIcon Symbol="FlowDot" Foreground="Orange" IsVisible="{Binding IsFpvServiceEnabled, Converter={nconv:ReverseBoolConverter}}" HorizontalAlignment="Left"/>
+                            <!-- TODO: implement loading indicator -->
+                            <!--<ui:SymbolIcon Symbol="ArrowSync" Foreground="{Binding ConnectionIconColor}" HorizontalAlignment="Right"/>-->
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Orientation="Vertical" Margin="8,0,8,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="BlueJay:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BluejayVersionColor}" Text="{Binding FpvSoftwareVersions.BlueJay}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Text="Betaflight FW:"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BetaflightVersionColor}" Text="{Binding FpvSoftwareVersions.BetaflightFw}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Text="ExpressLRS:"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding ElrsVersionColor}" Text="{Binding FpvSoftwareVersions.ExpressLRS}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Text="EdgeTX:"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding EdgeTxVersionColor}" Text="{Binding FpvSoftwareVersions.EdgeTX}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="12" Text="WhoopStor V3:"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding WhoopStorVersionColor}" Text="{Binding FpvSoftwareVersions.Whoopstor3}" FontWeight="Bold"/>
                         </StackPanel>
                     </StackPanel>
-                </Border>
-            </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
         <!-- # ### # -->
 
         <!-- Software Versions -->
-            <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
-                <Border CornerRadius="15" 
-                        BorderThickness="2" 
-                        Padding="2"
-                        Background="#1c1c1e">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                            <GradientStop Color="#06b6d4" Offset="0"/>
-                            <GradientStop Color="#3b82f6" Offset="0.25"/>
-                            <GradientStop Color="#8b5cf6" Offset="0.5"/>
-                            <GradientStop Color="#a855f7" Offset="0.75"/>
-                            <GradientStop Color="#ec4899" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <Border.Effect>
-                        <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
-                    </Border.Effect>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0">
-                        <Border Background="#2a2a2d" CornerRadius="12" Padding="12,8" Margin="4,4,4,8">
-                            <Label Content="Software Versions" 
-                                   FontSize="11" 
-                                   FontWeight="Bold"
-                                   Foreground="#777"
-                                   LetterSpacing="1"
-                                   HorizontalAlignment="Center"/>
-                        </Border>
+        <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
+            <Border Classes="card">
+                <StackPanel Orientation="Vertical" Margin="0">
+                    <Border Classes="card-header">
+                        <Label Content="Software Versions" Classes="card-header-label"/>
+                    </Border>
 
-                        <StackPanel Orientation="Vertical" Margin="8,0,8,8">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Blender:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BlenderVersionColor}" Text="{Binding Blender}" FontWeight="Bold"/>
-                            </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="8,0,8,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Blender:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding BlenderVersionColor}" Text="{Binding Blender}" FontWeight="Bold"/>
+                        </StackPanel>
 
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Godot:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding GodotVersionColor}" Text="{Binding Godot}" FontWeight="Bold"/>
-                            </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Godot:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Foreground="{Binding GodotVersionColor}" Text="{Binding Godot}" FontWeight="Bold"/>
                         </StackPanel>
                     </StackPanel>
-                </Border>
-            </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
         <!-- # ### # -->
 
         <!-- Unifi -->
-            <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
-                <Border CornerRadius="15" 
-                        BorderThickness="2" 
-                        Padding="2"
-                        Background="#1c1c1e">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                            <GradientStop Color="#06b6d4" Offset="0"/>
-                            <GradientStop Color="#3b82f6" Offset="0.25"/>
-                            <GradientStop Color="#8b5cf6" Offset="0.5"/>
-                            <GradientStop Color="#a855f7" Offset="0.75"/>
-                            <GradientStop Color="#ec4899" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <Border.Effect>
-                        <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
-                    </Border.Effect>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0">
-                        <Border Background="#2a2a2d" CornerRadius="12" Padding="12,8" Margin="4,4,4,8">
-                            <Label Content="UniFi Router" 
-                                   FontSize="11" 
-                                   FontWeight="Bold"
-                                   Foreground="#777"
-                                   LetterSpacing="1"
-                                   HorizontalAlignment="Center"/>
-                        </Border>
+        <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
+            <Border Classes="card">
+                <StackPanel Orientation="Vertical" Margin="0">
+                    <Border Classes="card-header">
+                        <Grid>
+                            <Label Classes="card-header-label" Content="UniFi Router"/>
+                            <ui:SymbolIcon Symbol="FlowDot" Foreground="Orange" IsVisible="{Binding IsUnifiServiceEnabled, Converter={nconv:ReverseBoolConverter}}" HorizontalAlignment="Left"/>
+                            <!-- TODO: implement loading indicator -->
+                            <!--<ui:SymbolIcon Symbol="ArrowSync" Foreground="{Binding ConnectionIconColor}" HorizontalAlignment="Right"/>-->
+                        </Grid>
+                    </Border>
 
-                        <StackPanel Orientation="Vertical" Margin="8,0,8,8">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Uptime:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.Uptime}" FontWeight="Bold"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Connected Clients:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.ClientsConnected}" FontWeight="Bold"/>
-                            </StackPanel>
-
-                            <Separator/>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="CPU:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.CpuUsage, StringFormat={}{0}%}" FontWeight="Bold"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Memory:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.MemoryUsage, StringFormat={}{0}%}" FontWeight="Bold"/>
-                            </StackPanel>
-
-                            <Separator/>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Download:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.DownloadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Upload:" FontSize="12"/>
-                                <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.UploadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
-                            </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="8,0,8,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Uptime:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.Uptime}" FontWeight="Bold"/>
                         </StackPanel>
 
-                        <TextBlock HorizontalAlignment="Right" Margin="0,0,12,0" Text="{Binding UnifiData.LastUpdated, Mode=OneWay, StringFormat={}{0:dd.MM.yy HH\:mm}}" FontWeight="Bold" FontSize="10" Foreground="Gray"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Connected Clients:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.ClientsConnected}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <Separator/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CPU:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.CpuUsage, StringFormat={}{0}%}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Memory:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.MemoryUsage, StringFormat={}{0}%}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <Separator/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Download:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.DownloadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Upload:" FontSize="12"/>
+                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.UploadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
+                        </StackPanel>
                     </StackPanel>
-                </Border>
-            </StackPanel>
+
+                    <TextBlock HorizontalAlignment="Right" Margin="0,0,12,0" Text="{Binding UnifiData.LastUpdated, Mode=OneWay, StringFormat={}{0:dd.MM.yy HH\:mm}}" FontWeight="Bold" FontSize="10" Foreground="Gray"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
         <!-- # ### # -->
 
         <!-- Logitech Devices -->
-            <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
-                <Border CornerRadius="15" 
-                        BorderThickness="2" 
-                        Padding="2"
-                        Background="#1c1c1e">
-                    <Border.BorderBrush>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                            <GradientStop Color="#06b6d4" Offset="0"/>
-                            <GradientStop Color="#3b82f6" Offset="0.25"/>
-                            <GradientStop Color="#8b5cf6" Offset="0.5"/>
-                            <GradientStop Color="#a855f7" Offset="0.75"/>
-                            <GradientStop Color="#ec4899" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.BorderBrush>
-                    <Border.Effect>
-                        <DropShadowEffect Color="#8b5cf6" BlurRadius="18" Opacity="0.5"/>
-                    </Border.Effect>
-                    
-                    <StackPanel Orientation="Vertical" Margin="0">
-                        <Border Background="#2a2a2d" CornerRadius="12" Padding="12,8" Margin="4,4,4,8">
-                            <Label Content="Logitech Wireless" 
-                                    FontSize="11" 
-                                    FontWeight="Bold"
-                                    Foreground="#777"
-                                    LetterSpacing="1"
-                                    HorizontalAlignment="Center"/>
-                        </Border>
+        <StackPanel Orientation="Vertical" Grid.Row="10" Margin="0,10,0,12" HorizontalAlignment="Center" VerticalAlignment="Center" Width="200" MaxWidth="200">
+            <Border Classes="card">
+                <StackPanel Orientation="Vertical" Margin="0">
+                    <Border Classes="card-header">
+                        <Label Content="Logitech Wireless" Classes="card-header-label"/>
+                    </Border>
 
-                        <StackPanel x:Name="LgsStackPanel" Orientation="Vertical" Margin="8,0,8,8">
-                            <!-- Filled by Code -->
-                            <li:LoadingIndicator Foreground="#a855f7" Mode="{Binding LgsLoadingIndicatorMode}" SpeedRatio="1.2" MaxWidth="64" />
-                        </StackPanel>
+                    <StackPanel x:Name="LgsStackPanel" Orientation="Vertical" Margin="8,0,8,8">
+                        <!-- Filled by Code -->
+                        <li:LoadingIndicator Foreground="#a855f7" Mode="{Binding LgsLoadingIndicatorMode}" SpeedRatio="1.2" MaxWidth="64" />
                     </StackPanel>
-                </Border>
-            </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
         <!-- # ### # -->
       </StackPanel>
   </Border>

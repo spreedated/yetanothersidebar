@@ -1,11 +1,10 @@
 ﻿#pragma warning disable S1075 // Suppress "URIs should not be hardcoded" warning since these are well-known API endpoints that are unlikely to change
 
 using HtmlAgilityPack;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using neXn.Lib;
 using Services.Models;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Services.Workers
 {
-    public class FpvSoftwareWorker : BackgroundService
+    public class FpvSoftwareWorker : ServiceWorker
     {
         private const string WHOOPSTOR3_URL = "https://viflydrone.com/pages/download-center";
 
@@ -35,16 +34,36 @@ namespace Services.Workers
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogTrace("FpvSoftwareWorker is running.");
-                Stopwatch s = Stopwatch.StartNew();
+                if (!base.IsEnabled)
+                {
+                    _logger?.LogTrace("FpvSoftwareWorker is disabled. Skipping processing.");
+                    return;
+                }
 
-                this.LatestVersion = await GetData();
-                this.LatestVersionsUpdated?.Invoke(this, this.LatestVersion);
+                try
+                {
+                    base.RaiseProcessedStarted();
 
-                s.Stop();
-                _logger.LogTrace("FpvSoftwareWorker completed a cycle in {ElapsedMilliseconds} ms.", s.ElapsedMilliseconds);
+                    await this.Process();
+
+                    base.RaiseProcessedFinished();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Process error");
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+
+                    continue;
+                }
+
                 await Task.Delay(TimeSpan.FromHours(4), stoppingToken);
             }
+        }
+
+        public override async Task Process()
+        {
+            this.LatestVersion = await GetData();
+            this.LatestVersionsUpdated?.Invoke(this, this.LatestVersion);
         }
 
         private static async Task<FpvSoftwareVersions> GetData()
@@ -134,7 +153,7 @@ namespace Services.Workers
 
             if (doc.RootElement.TryGetProperty("tag_name", out JsonElement tag))
             {
-                string v = tag.GetString().Replace("v", "");
+                string v = tag.GetString().AllowOnlyCharacters("0123456789.");
                 if (Version.TryParse(v, out Version ver))
                 {
                     return ver;
