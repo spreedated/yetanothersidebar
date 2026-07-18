@@ -115,6 +115,8 @@ namespace YamAva.ViewModels
 
                 this.BlenderVersionColor = GetBrush(VERSION_CURRENT_BRUSH_KEY);
                 this.GodotVersionColor = GetBrush(VERSION_NEWER_BRUSH_KEY);
+
+                this.AudioVolume = (int)Math.Abs(0.56f * 100);
             }
 
             if (!Design.IsDesignMode)
@@ -211,6 +213,75 @@ namespace YamAva.ViewModels
 
                     this.UnifiData = v;
                 };
+
+                AudioWorker aw = Globals.BackgroundServices.Services.GetService<AudioWorker>();
+                aw.VolumeChanged += this.OnVolumeChanged;
+                this.OnVolumeChanged(this, aw.Volume);
+                Application.Current.Dispatcher.Post(() =>
+                {
+                    ((MainWindow)this.Instance).DigitalSegmentHundreds.DigitChanged += (s, e) =>
+                    {
+                        if (e == -1)
+                        {
+                            return;
+                        }
+
+                        int vol = (int)aw.Volume * 100;
+
+                        if (e == 0)
+                        {
+                            aw.Volume = int.Parse($"{e}{vol.ToString()[0]}{vol.ToString()[1]}") / (float)100;
+                        }
+
+                        if (e == 1)
+                        {
+                            aw.Volume = 100 / (float)100;
+                        }
+                    };
+
+                    ((MainWindow)this.Instance).DigitalSegmentTens.DigitChanged += (s, e) =>
+                    {
+                        if (e == -1)
+                        {
+                            return;
+                        }
+
+                        float volf = aw.Volume * 100;
+                        int vol = (int)volf;
+
+                        if (vol >= 10 && vol < 100 && e <= 9)
+                        {
+                            aw.Volume = int.Parse($"{e}{vol.ToString()[1]}") / (float)100;
+                        }
+
+                        if (vol <= 9 && e <= 9)
+                        {
+                            aw.Volume = int.Parse($"{e}{vol.ToString()[0]}") / (float)100;
+                        }
+                    };
+
+                    ((MainWindow)this.Instance).DigitalSegmentOnes.DigitChanged += (s, e) =>
+                    {
+                        if (e == -1)
+                        {
+                            return;
+                        }
+
+                        float volf = aw.Volume * 100;
+                        int vol = (int)volf;
+
+                        if (vol >= 10 && vol < 100 && e <= 9)
+                        {
+                            aw.Volume = (float)Math.Round(int.Parse($"{vol.ToString()[0]}{e}") / (float)100, 2);
+                            return;
+                        }
+
+                        if (e <= 9)
+                        {
+                            aw.Volume = e / (float)100;
+                        }
+                    };
+                });
 
                 // Start background services
                 Task.Run(() =>
@@ -462,6 +533,68 @@ namespace YamAva.ViewModels
 
         [ObservableProperty]
         public partial UnifiData UnifiData { get; set; }
+        #endregion
+
+        #region Audio
+        [ObservableProperty]
+        public partial int AudioVolume { get; set; }
+
+        [ObservableProperty]
+        public partial Symbol AudioIcon { get; set; } = Symbol.Speaker0;
+
+        private void OnVolumeChanged(object sender, float volume)
+        {
+            this.AudioVolume = (int)Math.Abs(volume * 100);
+
+            string volStr = this.AudioVolume.ToString();
+
+            Application.Current.Dispatcher.Post(() =>
+            {
+                if (this.Instance != null && ((MainWindow)this.Instance).DigitalSegmentHundreds != null)
+                {
+                    if (volStr.Length == 3)
+                    {
+                        ((MainWindow)this.Instance).DigitalSegmentHundreds.SetDigit(1);
+                        ((MainWindow)this.Instance).DigitalSegmentTens.SetDigit(0);
+                        ((MainWindow)this.Instance).DigitalSegmentOnes.SetDigit(0);
+                    }
+
+                    if (volStr.Length == 2)
+                    {
+                        ((MainWindow)this.Instance).DigitalSegmentHundreds.SetDigit(10);
+                        ((MainWindow)this.Instance).DigitalSegmentTens.SetDigit(int.Parse(volStr[0].ToString()));
+                        ((MainWindow)this.Instance).DigitalSegmentOnes.SetDigit(int.Parse(volStr[1].ToString()));
+                    }
+
+                    if (volStr.Length == 1)
+                    {
+                        ((MainWindow)this.Instance).DigitalSegmentHundreds.SetDigit(10);
+                        ((MainWindow)this.Instance).DigitalSegmentTens.SetDigit(10);
+                        ((MainWindow)this.Instance).DigitalSegmentOnes.SetDigit(this.AudioVolume);
+                    }
+                }
+            });
+
+            if (this.AudioVolume <= 10)
+            {
+                this.AudioIcon = Symbol.Speaker0;
+            }
+
+            if (this.AudioVolume >= 11 && this.AudioVolume <= 50)
+            {
+                this.AudioIcon = Symbol.Speaker1;
+            }
+
+            if (this.AudioVolume >= 51)
+            {
+                this.AudioIcon = Symbol.Speaker2;
+            }
+
+            if (this.AudioVolume <= 0)
+            {
+                this.AudioIcon = Symbol.SpeakerMute;
+            }
+        }
         #endregion
 
         #region Connection Icon

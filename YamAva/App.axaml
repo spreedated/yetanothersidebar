@@ -18,11 +18,76 @@
             <SolidColorBrush x:Key="VersionOldBrush" Color="{StaticResource VersionOldColor}"/>
             <SolidColorBrush x:Key="VersionCurrentBrush" Color="{StaticResource VersionCurrentColor}"/>
             <SolidColorBrush x:Key="VersionNewerBrush" Color="{StaticResource VersionNewerColor}"/>
+
+            <StreamGeometry x:Key="HorSegment">M6,0 L54,0 L60,6 L54,12 L6,12 L0,6 Z</StreamGeometry>
+            <StreamGeometry x:Key="VerSegment">M0,6 L6,0 L12,6 L12,54 L6,60 L0,54 Z</StreamGeometry>
         </ResourceDictionary>
     </Application.Resources>
   
     <Application.Styles>
         <FluentTheme />
+
+       <!-- Expander -->
+        <Style Selector="Expander:pointerover">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Remove header background -->
+        <Style Selector="ToggleButton:pointerover /template/ Border#ToggleButtonBackground">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <!-- Remove chevron background -->
+        <Style Selector="ToggleButton:pointerover /template/ Border#ExpandCollapseChevronBorder">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton:pointerover">
+            <Setter Property="Opacity" Value="0.85"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton:pressed">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton:checked">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton:checked:pointerover">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Expander.dashboard /template/ ToggleButton:focus">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+       <!-- # ### # -->
 
         <Style Selector="Border.card">
             <Setter Property="CornerRadius" Value="15"/>
@@ -70,6 +135,22 @@
         <Style Selector="Button">
           <Setter Property="Foreground" Value="WhiteSmoke"/>
         </Style>
+
+        <Style Selector="Button.segment">
+              <Setter Property="Background" Value="Transparent"/>
+              <Setter Property="Padding" Value="0"/>
+              <Setter Property="Cursor" Value="Hand"/>
+
+              <!-- Hover state -->
+              <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                  <Setter Property="Background" Value="Transparent"/>
+              </Style>
+
+              <!-- Pressed state -->
+              <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                  <Setter Property="Background" Value="Transparent"/>
+              </Style>
+         </Style>
 
         <Style Selector="Button.transparent-icon">
               <Setter Property="Background" Value="Transparent"/>

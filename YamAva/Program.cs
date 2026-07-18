@@ -79,14 +79,19 @@ namespace YamAva
                         Password = Globals.UserConfig.RuntimeConfiguration.UniFiPassword
                     }, Globals.UserConfig.RuntimeConfiguration.UniFiSslThumbprints);
                 });
+                builder.Services.AddSingleton<AudioWorker>(sp =>
+                {
+                    return new AudioWorker(new SerilogLoggerProvider().CreateLogger("audio"));
+                });
 
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<GodotWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<BlenderWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<LgDeviceWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<WeatherWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<FpvSoftwareWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<UniFiWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<GodotWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<BlenderWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<LgDeviceWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<WeatherWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<FpvSoftwareWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<UniFiWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<AudioWorker>());
 
                 Globals.ServiceDescriptors = [.. builder.Services];
 
