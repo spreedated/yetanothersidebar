@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record FpvSoftwareVersions
+    public sealed record FpvSoftwareVersions
     {
         public Version BetaflightFw { get; set; }
         public Version ExpressLRS { get; set; }

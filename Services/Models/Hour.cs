@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Services.Models
 {
-    public record Hour
+    public sealed record Hour
     {
         [JsonPropertyName("time_epoch")]
         public int TimeEpoch { get; set; }

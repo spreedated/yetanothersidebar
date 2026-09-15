@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record UnifiData
+    public sealed record UnifiData
     {
         public int ClientsConnected { get; init; }
         public float DownloadBps { get; init; }

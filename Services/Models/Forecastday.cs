@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Services.Models
 {
-    public record Forecastday
+    public sealed record Forecastday
     {
         [JsonPropertyName("date")]
         public DateTime Date { get; set; }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Services.Models
 {
-    public record InstalledSoftware
+    public sealed record InstalledSoftware
     {
         [JsonPropertyName("godot")]
         public Version Godot { get; set; }

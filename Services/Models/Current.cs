@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Services.Models
 {
-    public record Current
+    public sealed record Current
     {
         [JsonPropertyName("last_updated_epoch")]
         public int LastUpdatedEpoch { get; set; }

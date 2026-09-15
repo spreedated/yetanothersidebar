@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record Day
+    public sealed record Day
     {
         [JsonPropertyName("maxtemp_c")]
         public double MaxtempC { get; set; }

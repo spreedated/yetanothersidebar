@@ -21,4 +21,13 @@
         POWER_SUPPLY_STATUS_NOT_CHARGING,
         POWER_SUPPLY_STATUS_UNKNOWN
     }
+
+    public enum SteamControllerPowerState
+    {
+        Unknown,
+        Disconnected,
+        OnBattery,
+        Charging,
+        Charged
+    }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Services.Models
 {
-    public record Location
+    public sealed record Location
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

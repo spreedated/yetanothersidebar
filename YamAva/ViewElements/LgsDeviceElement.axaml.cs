@@ -10,59 +10,43 @@ namespace YamAva.ViewElements;
 
 public partial class LgsDeviceElement : UserControl
 {
-    public static readonly DirectProperty<LgsDeviceElement, LogitechDevice> LogitechDeviceProperty = AvaloniaProperty.RegisterDirect<LgsDeviceElement, LogitechDevice>(nameof(LogitechDevice), o => o.LogitechDevice, (o, v) => o.LogitechDevice = v, defaultBindingMode: BindingMode.TwoWay);
-    private LogitechDevice logitechDevice;
+    public static readonly StyledProperty<LogitechDevice> LogitechDeviceProperty =
+    AvaloniaProperty.Register<LgsDeviceElement, LogitechDevice>(nameof(LogitechDevice), defaultBindingMode: BindingMode.TwoWay);
+
     public LogitechDevice LogitechDevice
     {
-        get { return this.logitechDevice; }
-        set
-        {
-            LogitechDevice oldValue = value;
-            this.logitechDevice = value;
-            this.RaisePropertyChanged<LogitechDevice>(LogitechDeviceProperty, oldValue, value);
-            this.SetBatteryIndicator();
-            this.SetDeviceType();
-            this.IsCharging = value.PowerSupplyStatus == Services.PowerSupplyStatus.POWER_SUPPLY_STATUS_CHARGING;
-        }
+        get => base.GetValue(LogitechDeviceProperty);
+        set => base.SetValue(LogitechDeviceProperty, value);
     }
 
-    public static readonly DirectProperty<LgsDeviceElement, Bitmap> BatteryIndicatorProperty = AvaloniaProperty.RegisterDirect<LgsDeviceElement, Bitmap>(nameof(BatteryIndicator), o => o.BatteryIndicator, (o, v) => o.BatteryIndicator = v, defaultBindingMode: BindingMode.TwoWay);
-    private Bitmap batteryIndicator;
+
+    public static readonly StyledProperty<Bitmap> BatteryIndicatorProperty =
+        AvaloniaProperty.Register<LgsDeviceElement, Bitmap>(nameof(BatteryIndicator), defaultBindingMode: BindingMode.TwoWay);
+
     public Bitmap BatteryIndicator
     {
-        get { return this.batteryIndicator; }
-        set
-        {
-            Bitmap oldValue = value;
-            this.batteryIndicator = value;
-            this.RaisePropertyChanged<Bitmap>(BatteryIndicatorProperty, oldValue, value);
-        }
+        get => base.GetValue(BatteryIndicatorProperty);
+        set => base.SetValue(BatteryIndicatorProperty, value);
     }
 
-    public static readonly DirectProperty<LgsDeviceElement, Bitmap> DeviceTypeProperty = AvaloniaProperty.RegisterDirect<LgsDeviceElement, Bitmap>(nameof(DeviceType), o => o.DeviceType, (o, v) => o.DeviceType = v, defaultBindingMode: BindingMode.TwoWay);
-    private Bitmap deviceType;
+
+    public static readonly StyledProperty<Bitmap> DeviceTypeProperty =
+        AvaloniaProperty.Register<LgsDeviceElement, Bitmap>(nameof(DeviceType), defaultBindingMode: BindingMode.TwoWay);
+
     public Bitmap DeviceType
     {
-        get { return this.deviceType; }
-        set
-        {
-            Bitmap oldValue = value;
-            this.deviceType = value;
-            this.RaisePropertyChanged<Bitmap>(DeviceTypeProperty, oldValue, value);
-        }
+        get => base.GetValue(DeviceTypeProperty);
+        set => base.SetValue(DeviceTypeProperty, value);
     }
 
-    public static readonly DirectProperty<LgsDeviceElement, bool> IsChargingProperty = AvaloniaProperty.RegisterDirect<LgsDeviceElement, bool>(nameof(IsCharging), o => o.IsCharging, (o, v) => o.IsCharging = v, defaultBindingMode: BindingMode.TwoWay);
-    private bool isCharging;
+
+    public static readonly StyledProperty<bool> IsChargingProperty =
+        AvaloniaProperty.Register<LgsDeviceElement, bool>(nameof(IsCharging), defaultBindingMode: BindingMode.TwoWay);
+
     public bool IsCharging
     {
-        get { return this.isCharging; }
-        set
-        {
-            bool oldValue = value;
-            this.isCharging = value;
-            this.RaisePropertyChanged<bool>(IsChargingProperty, oldValue, value);
-        }
+        get => base.GetValue(IsChargingProperty);
+        set => base.SetValue(IsChargingProperty, value);
     }
 
     #region Ctor
@@ -103,29 +87,15 @@ public partial class LgsDeviceElement : UserControl
         }
     }
 
-    private void SetBatteryIndicator()
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
-        if (this.LogitechDevice.BatteryPercentage >= 91)
-        {
-            this.BatteryIndicator = new Bitmap(AssetLoader.Open(new Uri("avares://YamAva/Resources/Indicator_100.png")));
-            return;
-        }
-        if (this.LogitechDevice.BatteryPercentage >= 50)
-        {
-            this.BatteryIndicator = new Bitmap(AssetLoader.Open(new Uri("avares://YamAva/Resources/Indicator_50.png")));
-            return;
-        }
-        if (this.LogitechDevice.BatteryPercentage >= 30)
-        {
-            this.BatteryIndicator = new Bitmap(AssetLoader.Open(new Uri("avares://YamAva/Resources/Indicator_30.png")));
-            return;
-        }
-        if (this.LogitechDevice.BatteryPercentage >= 10)
-        {
-            this.BatteryIndicator = new Bitmap(AssetLoader.Open(new Uri("avares://YamAva/Resources/Indicator_10.png")));
-            return;
-        }
+        base.OnPropertyChanged(change);
 
-        this.BatteryIndicator = new Bitmap(AssetLoader.Open(new Uri("avares://YamAva/Resources/Indicator_10.png")));
+        if (change.Property == LogitechDeviceProperty && change.NewValue is LogitechDevice device)
+        {
+            this.SetDeviceType();
+
+            this.IsCharging = device.PowerSupplyStatus == Services.PowerSupplyStatus.POWER_SUPPLY_STATUS_CHARGING;
+        }
     }
 }

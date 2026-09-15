@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record Condition
+    public sealed record Condition
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }

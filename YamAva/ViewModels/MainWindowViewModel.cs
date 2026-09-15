@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentIcons.Common;
@@ -117,6 +119,12 @@ namespace YamAva.ViewModels
                 this.GodotVersionColor = GetBrush(VERSION_NEWER_BRUSH_KEY);
 
                 this.AudioVolume = (int)Math.Abs(0.56f * 100);
+
+                this.SteamControllerModel = new()
+                {
+                    BatteryPercentage = 86,
+                    Powerstate = Services.SteamControllerPowerState.OnBattery
+                };
             }
 
             if (!Design.IsDesignMode)
@@ -212,6 +220,23 @@ namespace YamAva.ViewModels
                     }
 
                     this.UnifiData = v;
+                };
+
+                Globals.BackgroundServices.Services.GetService<SteamControllerWorker>().StateUpdated += (s, v) =>
+                {
+                    if (v != null)
+                    {
+                        this.SteamControllerModel = v;
+                    }
+
+                    if (v == null || v.Powerstate == Services.SteamControllerPowerState.Unknown)
+                    {
+                        this.IsSteamControllerDisconnected = true;
+                    }
+                    else
+                    {
+                        this.IsSteamControllerDisconnected = false;
+                    }
                 };
 
                 AudioWorker aw = Globals.BackgroundServices.Services.GetService<AudioWorker>();
@@ -465,6 +490,13 @@ namespace YamAva.ViewModels
                 await Globals.BackgroundServices.Services.GetServices<IHostedService>().OfType<ServiceWorker>().First(x => x.GetType() == typeof(WeatherWorker)).Process();
             });
         }
+        #endregion
+
+        #region SteamController
+        [ObservableProperty]
+        public partial SteamController SteamControllerModel { get; set; }
+        [ObservableProperty]
+        public partial bool IsSteamControllerDisconnected { get; set; }
         #endregion
 
         #region FpvFirmwares

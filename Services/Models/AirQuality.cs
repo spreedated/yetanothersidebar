@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record AirQuality
+    public sealed record AirQuality
     {
         [JsonPropertyName("co")]
         public double Co { get; set; }

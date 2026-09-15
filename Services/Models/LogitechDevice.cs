@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record LogitechDevice
+    public sealed record LogitechDevice
     {
         public double BatteryMileage { get; set; }
         public double BatteryPercentage { get; set; }

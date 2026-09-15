@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record LoginRequest
+    public sealed record LoginRequest
     {
         [JsonPropertyName("username")]
         public string Username { get; init; }

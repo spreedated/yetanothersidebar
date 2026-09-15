@@ -2,7 +2,7 @@
 
 namespace Services.Models
 {
-    public record WeatherApi
+    public sealed record WeatherApi
     {
         [JsonPropertyName("location")]
         public Location WeatherLocation { get; set; }
