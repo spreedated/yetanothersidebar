@@ -18,11 +18,12 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.13.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
-    <PackageReference Include="NAudio" Version="2.3.0" />
+    <PackageReference Include="NAudio.Wasapi" Version="3.1.0" />
     <PackageReference Include="neXn.Analyzers" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="neXn.SteamController2026.SDL3" Version="1.0.1" />
     <PackageReference Include="Refit" Version="15.2.0" />
     <PackageReference Include="SDL3-CS" Version="3.4.16" />
     <PackageReference Include="Serilog" Version="4.4.0" />

@@ -1,14 +1,13 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentIcons.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using neXn.SteamController2026.SDL3.Models;
 using neXn.Ui.Avalonia;
 using Services.Models;
 using Services.Workers;
@@ -123,7 +122,7 @@ namespace YamAva.ViewModels
                 this.SteamControllerModel = new()
                 {
                     BatteryPercentage = 86,
-                    Powerstate = Services.SteamControllerPowerState.OnBattery
+                    PowerState = SteamControllerPowerState.OnBattery
                 };
             }
 
@@ -229,7 +228,7 @@ namespace YamAva.ViewModels
                         this.SteamControllerModel = v;
                     }
 
-                    if (v == null || v.Powerstate == Services.SteamControllerPowerState.Unknown)
+                    if (v == null || v.PowerState == SteamControllerPowerState.Unknown || v.PowerState == SteamControllerPowerState.Disconnected)
                     {
                         this.IsSteamControllerDisconnected = true;
                     }
@@ -331,8 +330,8 @@ namespace YamAva.ViewModels
                 return GetBrush(VERSION_CURRENT_BRUSH_KEY);
             }
 
-            Version l = new(latest.Major, Math.Max(latest.Minor, 0), Math.Max(latest.Build,0), Math.Max(latest.Revision, 0));
-            Version i = new(installed.Major, Math.Max(installed.Minor, 0), Math.Max(installed.Build,0), Math.Max(installed.Revision, 0));
+            Version l = new(latest.Major, Math.Max(latest.Minor, 0), Math.Max(latest.Build, 0), Math.Max(latest.Revision, 0));
+            Version i = new(installed.Major, Math.Max(installed.Minor, 0), Math.Max(installed.Build, 0), Math.Max(installed.Revision, 0));
 
             if (l < i)
             {
@@ -494,7 +493,7 @@ namespace YamAva.ViewModels
 
         #region SteamController
         [ObservableProperty]
-        public partial SteamController SteamControllerModel { get; set; }
+        public partial SteamControllerStatus SteamControllerModel { get; set; }
         [ObservableProperty]
         public partial bool IsSteamControllerDisconnected { get; set; }
         #endregion

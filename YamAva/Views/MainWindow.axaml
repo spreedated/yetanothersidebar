@@ -261,7 +261,7 @@
                     </StackPanel>
 
                     <StackPanel x:Name="HardwarePanel">
-                        <ve:WirelessDeviceElement IsDisconnected="{Binding IsSteamControllerDisconnected}" DeviceName="SCTRL" IsCharging="{Binding SteamControllerModel.IsCharging}" DeviceIcon="/Resources/steamcontroller.png" BatteryPercentage="{Binding SteamControllerModel.BatteryPercentage}"/>
+                        <ve:WirelessDeviceElement IsDisconnected="{Binding IsSteamControllerDisconnected}" DeviceName="SCTRL" IsCharging="{Binding SteamControllerModel.PowerState, Converter={vl:BatteryPowerstateConverter}}" DeviceIcon="/Resources/steamcontroller.png" BatteryPercentage="{Binding SteamControllerModel.BatteryPercentage}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

@@ -9,7 +9,7 @@ namespace Services.Workers
     public class AudioWorker : ServiceWorker
     {
         private readonly ILogger _logger;
-        private MMDevice _device;
+        private readonly MMDevice _device;
 
         public event EventHandler<float> VolumeChanged;
 

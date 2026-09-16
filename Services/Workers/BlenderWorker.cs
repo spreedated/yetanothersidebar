@@ -1,12 +1,11 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using neXn.Lib;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using neXn.Lib.Strings;
-using neXn.Lib;
 
 namespace Services.Workers
 {
