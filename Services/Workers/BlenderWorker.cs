@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using neXn.Lib;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -97,7 +98,7 @@ namespace Services.Workers
                 return default;
             }
 
-            var node = doc.DocumentNode.SelectSingleNode("//ul[@class='dl-build-details mb-0']/li[3]");
+            var node = doc.DocumentNode.SelectNodes("//ul[@class='dl-build-details mb-0']/li").FirstOrDefault(x => x.InnerHtml.StartsWith('v'));
 
             if (node == null)
             {
