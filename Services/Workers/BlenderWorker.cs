@@ -1,4 +1,6 @@
-﻿using HtmlAgilityPack;
+﻿#pragma warning disable S1075 // URIs should not be hardcoded
+
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using neXn.Lib;
 using System;
@@ -56,7 +58,7 @@ namespace Services.Workers
         public override async Task Process()
         {
             HtmlDocument doc = await this.DownloadSourcecode();
-            this.LatestVersion = this.ParseSourcecode(doc);
+            this.LatestVersion = ParseSourcecode(doc);
             this.LatestVersionUpdated?.Invoke(this, this.LatestVersion);
         }
 
@@ -91,7 +93,7 @@ namespace Services.Workers
             }
         }
 
-        private Version ParseSourcecode(HtmlDocument doc)
+        private static Version ParseSourcecode(HtmlDocument doc)
         {
             if (doc == null)
             {

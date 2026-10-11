@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using System;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Services.Workers
 {
+    [SupportedOSPlatform("windows")]
     public class AudioWorker : ServiceWorker
     {
         private readonly ILogger _logger;
