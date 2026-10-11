@@ -9,6 +9,7 @@
         xmlns:li="using:neXn.Ui.Avalonia"
         xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         xmlns:ui="using:FluentIcons.Avalonia"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
         mc:Ignorable="d"
         x:Class="YamAva.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -230,14 +231,50 @@
 
                         <Separator/>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Download:" FontSize="12"/>
-                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.DownloadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                            <TextBlock Foreground="#38BDF8" Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiThroughputData.DownloadBps, Converter={vl:DecideBytesPerSecondConverter}, StringFormat={}↓ {0}}" FontWeight="Bold"/>
+                            <TextBlock Foreground="#A855F7" Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiThroughputData.UploadBps, Converter={vl:DecideBytesPerSecondConverter}, StringFormat={}↑ {0}}" FontWeight="Bold"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Upload:" FontSize="12"/>
-                            <TextBlock Margin="6,0,0,0" FontSize="12" Text="{Binding UnifiData.UploadBps, Converter={vl:DecideBytesPerSecondConverter}}" FontWeight="Bold"/>
+                        <StackPanel>
+                            <lvc:CartesianChart
+                                Width="200"
+                                Height="80"
+                                Background="Transparent"
+                                LegendPosition="Hidden"
+                                TooltipPosition="Hidden">
+
+                                <lvc:CartesianChart.Series>
+
+                                    <!-- Download -->
+                                    <lvc:XamlLineSeries
+                                        SeriesName="Download"
+                                        Values="{Binding DownloadHistory}"
+                                        Stroke="{lvc:SolidColorPaint Color='#38BDF8', StrokeWidth=1}"
+                                        Fill="{lvc:SolidColorPaint Color='#2638BDF8'}"
+                                        GeometrySize="0"
+                                        LineSmoothness="0" />
+
+                                    <!-- Upload -->
+                                    <lvc:XamlLineSeries
+                                        SeriesName="Upload"
+                                        Values="{Binding UploadHistory}"
+                                        Stroke="{lvc:SolidColorPaint Color='#A855F7', StrokeWidth=1}"
+                                        Fill="{x:Null}"
+                                        GeometrySize="0"
+                                        LineSmoothness="0" />
+
+                                </lvc:CartesianChart.Series>
+
+                                <lvc:CartesianChart.XAxes>
+                                    <lvc:XamlAxis IsVisible="False" />
+                                </lvc:CartesianChart.XAxes>
+
+                                <lvc:CartesianChart.YAxes>
+                                    <lvc:XamlAxis IsVisible="False" MinLimit="0" />
+                                </lvc:CartesianChart.YAxes>
+
+                            </lvc:CartesianChart>
                         </StackPanel>
                     </StackPanel>
 

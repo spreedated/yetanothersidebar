@@ -124,6 +124,25 @@ namespace YamAva.ViewModels
                     BatteryPercentage = 86,
                     PowerState = SteamControllerPowerState.OnBattery
                 };
+
+                foreach (double v in new double[] { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 })
+                {
+                    this.DownloadHistory.Add(v);
+                }
+
+                foreach (double v in new double[] { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 })
+                {
+                    this.UploadHistory.Add(v);
+                }
+
+                this.UnifiData = new()
+                {
+                    ClientsConnected = 10,
+                    CpuUsage = 20,
+                    LastUpdated = DateTime.Now,
+                    MemoryUsage = 30,
+                    Uptime = "1d 2h 3m"
+                };
             }
 
             if (!Design.IsDesignMode)
@@ -209,16 +228,30 @@ namespace YamAva.ViewModels
                         {
                             ClientsConnected = -1,
                             CpuUsage = -1,
-                            DownloadBps = -1,
                             LastUpdated = DateTime.Now,
                             MemoryUsage = -1,
-                            UploadBps = -1,
                             Uptime = "---"
                         };
                         return;
                     }
-
+                    
                     this.UnifiData = v;
+                };
+
+                Globals.BackgroundServices.Services.GetService<UniFiThroughputWorker>().LatestUnifiThroughputUpdated += (s, v) =>
+                {
+                    this.UnifiThroughputData = v;
+                    if (v.Error)
+                    {
+                        this.UnifiThroughputData = new()
+                        {
+                            DownloadBps = -1,
+                            UploadBps = -1
+                        };
+                        return;
+                    }
+
+                    this.UnifiThroughputData = v;
                 };
 
                 Globals.BackgroundServices.Services.GetService<SteamControllerWorker>().StateUpdated += (s, v) =>
@@ -559,11 +592,49 @@ namespace YamAva.ViewModels
         #endregion
 
         #region Unifi
+        public ObservableCollection<double> DownloadHistory { get; } = [];
+        public ObservableCollection<double> UploadHistory { get; } = [];
+
         [ObservableProperty]
         public partial bool IsUnifiServiceEnabled { get; set; } = true;
 
         [ObservableProperty]
         public partial UnifiData UnifiData { get; set; }
+
+        [ObservableProperty]
+        public partial UnifiThroughput UnifiThroughputData { get; set; }
+
+        partial void OnUnifiThroughputDataChanged(UnifiThroughput oldValue, UnifiThroughput newValue)
+        {
+            if (oldValue == null || newValue == null)
+            {
+                return;
+            }
+
+            if (oldValue.DownloadBps == newValue.DownloadBps && oldValue.UploadBps == newValue.UploadBps)
+            {
+                return;
+            }
+
+            if (DownloadHistory.Count > 60)
+            {
+                DownloadHistory.RemoveAt(0);
+            }
+
+            if (UploadHistory.Count > 60)
+            {
+                UploadHistory.RemoveAt(0);
+            }
+
+            if (this.DownloadHistory.Count == 0 || this.UploadHistory.Count == 0)
+            {
+                this.DownloadHistory.Add(newValue.DownloadKbps);
+                this.UploadHistory.Add(newValue.UploadKbps);
+            }
+
+            this.DownloadHistory.Add(newValue.DownloadKbps);
+            this.UploadHistory.Add(newValue.UploadKbps);
+        }
         #endregion
 
         #region Audio

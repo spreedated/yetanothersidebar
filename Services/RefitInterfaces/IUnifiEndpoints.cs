@@ -15,6 +15,9 @@ namespace Services.RefitInterfaces
         [Get("/proxy/network/api/s/default/stat/device")]
         Task<ApiResponse<string>> GetDeviceAsync();
 
+        [Get("/proxy/network/api/s/default/stat/device/{mac}")]
+        Task<ApiResponse<string>> GetGatewayAsync(string mac);
+
         [Post("/api/auth/login")]
         Task<ApiResponse<string>> LoginAsync([Body] LoginRequest credentials);
     }

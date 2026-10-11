@@ -8,20 +8,24 @@ namespace YamAva.ViewLogic
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            float bps = (float)value;
+            float bps = (float)value * 8;
+
+            if (bps >= 1_000_000_000)
+            {
+                return $"{bps / 1_000_000_000f:0.##} Gbps";
+            }
 
             if (bps >= 1_000_000)
             {
-                return $"{(bps * 8) / 1_000_000f:0.##} Mbps";
+                return $"{bps / 1_000_000f:0.##} Mbps";
             }
-            else if (bps >= 1000)
+
+            if (bps >= 1_000)
             {
-                return $"{(bps * 8) / 1000f:0.##} Kbps";
+                return $"{bps / 1_000f:0.##} Kbps";
             }
-            else
-            {
-                return $"{(bps * 8):0.##} bps";
-            }
+
+            return $"{bps:0.##} bps";
         }
 
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

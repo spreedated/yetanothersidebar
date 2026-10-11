@@ -18,6 +18,8 @@ namespace Services.Workers
 {
     public class UniFiWorker : ServiceWorker
     {
+        private const int _defaultIntervalSeconds = 10;
+
         private readonly ILogger _logger;
         private readonly string[] _validSslThumbprints;
         private readonly LoginRequest _credentials;
@@ -100,26 +102,19 @@ namespace Services.Workers
             {
                 IUnifiEndpoints rr = RestService.For<IUnifiEndpoints>(client);
 
-                ApiResponse<string> ss = await rr.GetHealthAsync();
+                ApiResponse<string> statsResponse = await rr.GetStatsAsync();
 
-                if (ss.Error != null)
+                if (statsResponse.Error != null)
                 {
                     throw new EntryPointNotFoundException("Service Unavailable");
                 }
 
-                if (ss.StatusCode == HttpStatusCode.Unauthorized)
+                if (statsResponse.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     await this.GetLoginCookie();
                     await this.Process();
                     return;
                 }
-
-                JsonDocument doc = JsonDocument.Parse(ss.Content);
-
-                int uploadThroughput = doc.RootElement.GetProperty("data").EnumerateArray().FirstOrDefault(x => x.GetProperty("subsystem").GetString() == "www").GetProperty("tx_bytes-r").GetInt32();
-                int downloadThroughput = doc.RootElement.GetProperty("data").EnumerateArray().FirstOrDefault(x => x.GetProperty("subsystem").GetString() == "www").GetProperty("rx_bytes-r").GetInt32();
-
-                ApiResponse<string> statsResponse = await rr.GetStatsAsync();
 
                 JsonDocument docStats = JsonDocument.Parse(statsResponse.Content);
 
@@ -145,8 +140,6 @@ namespace Services.Workers
                     MemoryUsage = memUsage,
                     Uptime = uptimeString,
                     ClientsConnected = connectedClients,
-                    DownloadBps = downloadThroughput,
-                    UploadBps = uploadThroughput,
                     LastUpdated = DateTime.Now
                 };
             }
@@ -174,12 +167,12 @@ namespace Services.Workers
                 catch (Exception ex)
                 {
                     _logger?.LogError(ex, "Process error");
-                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_defaultIntervalSeconds), stoppingToken);
 
                     continue;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(_defaultIntervalSeconds), stoppingToken);
             }
         }
     }

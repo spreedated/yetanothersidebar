@@ -83,6 +83,14 @@ namespace YamAva
                         Password = Globals.UserConfig.RuntimeConfiguration.UniFiPassword
                     }, Globals.UserConfig.RuntimeConfiguration.UniFiSslThumbprints);
                 });
+                builder.Services.AddSingleton(sp =>
+                {
+                    return new UniFiThroughputWorker(new SerilogLoggerProvider().CreateLogger("unifithroughput"), new()
+                    {
+                        Username = Globals.UserConfig.RuntimeConfiguration.UniFiUsername,
+                        Password = Globals.UserConfig.RuntimeConfiguration.UniFiPassword
+                    }, Globals.UserConfig.RuntimeConfiguration.UniFiSslThumbprints);
+                });
 
                 if (OperatingSystem.IsWindows())
                 {
@@ -94,19 +102,20 @@ namespace YamAva
 #pragma warning restore CA1416 // Validate platform compatibility
                 }
 
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<SteamControllerWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<GodotWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<BlenderWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<LgDeviceWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<WeatherWorker>());
-                builder.Services.AddHostedService(sp => sp.GetRequiredService<FpvSoftwareWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<SteamControllerWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<InstalledSoftwareWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<GodotWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<BlenderWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<LgDeviceWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<WeatherWorker>());
+                //builder.Services.AddHostedService(sp => sp.GetRequiredService<FpvSoftwareWorker>());
                 builder.Services.AddHostedService(sp => sp.GetRequiredService<UniFiWorker>());
+                builder.Services.AddHostedService(sp => sp.GetRequiredService<UniFiThroughputWorker>());
 
                 if (OperatingSystem.IsWindows())
                 {
 #pragma warning disable CA1416 // Validate platform compatibility
-                    builder.Services.AddHostedService(sp => sp.GetRequiredService<AudioWorker>());
+                    //builder.Services.AddHostedService(sp => sp.GetRequiredService<AudioWorker>());
 #pragma warning restore CA1416 // Validate platform compatibility
                 }
 
